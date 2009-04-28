@@ -206,7 +206,7 @@ class Window (pyglet.window.Window):
         self.border.update()
         gl.glEnable(gl.GL_DEPTH_TEST)
         self.axis.update()
-        #~ self.cage.update()
+        self.cage.update()
         self.terrain.update()
         for model in self.models:
             model.update(self.step)
