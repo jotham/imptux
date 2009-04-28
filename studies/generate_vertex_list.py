@@ -12,14 +12,17 @@ def main (filename):
             faces.append(parts[1:])
     output_lists = []
     for face in faces:
-        last = None
+        first = last = None
         vertex_list = []
         for part in face:
             elements = part.split('/')
             i = int(elements[0])-1
             if last:
                 vertex_list.extend([last[0], last[1], last[2], verticies[i][0], verticies[i][1], verticies[i][2]])
+            else:
+                first = (verticies[i][0], verticies[i][1], verticies[i][2])
             last = (verticies[i][0], verticies[i][1], verticies[i][2])
+        vertex_list.extend([last[0], last[1], last[2], first[0], first[1], first[2]])
         output_lists.append(vertex_list)
     
     for vertex_list in output_lists:
