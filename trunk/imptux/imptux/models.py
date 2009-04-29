@@ -1,82 +1,20 @@
-import pyglet, random, time, math
-from pyglet import gl
-
-TWO_PI = 6.283185307179586476925286766559
-
-class Camera (object):
-    def __init__ (self):
-        self.fieldofview = 60
-        self.clipnear = 0.1
-        self.clipfar = 8192
-        self.x = 0
-        self.y = 0
-        self.z = 512
-        self.rx = 0
-        self.ry = 0
-        self.rz = 0
-        
-    def defaultView (self, width, height):
-        self.width = width
-        self.height = height
-        gl.glViewport(0, 0, self.width, self.height)
-        gl.glMatrixMode(gl.GL_PROJECTION)
-        gl.glLoadIdentity()
-        gl.gluPerspective(self.fieldofview, self.width/float(self.height), self.clipnear, self.clipfar)
-        gl.glMatrixMode(gl.GL_MODELVIEW)
-        
-    def update(self):
-        gl.glLoadIdentity()
-        gl.glTranslatef(-self.x,-self.y,-self.z)
-        gl.glRotatef(self.rx,1,0,0)
-        gl.glRotatef(self.ry,0,1,0)
-        gl.glRotatef(self.rz,0,0,1)
-
-class Axis (object):
-    def __init__ (self, x=0, y=0, z=0, size=100):
-        self.vertex_list = pyglet.graphics.vertex_list(6,
-            ('v3f/static', (0,0,0,size,0,0,0,0,0,0,size,0,0,0,0,0,0,size)), 
-            ('c3B/static', (255,0,0,255,0,0,0,255,0,0,255,0,0,0,255,0,0,255)))
-        self.ry = 0
-        self.ryv = 0
-        self.x = x
-        self.y = y
-        self.z = z
-        
-    def update (self):
-        self.ry += self.ryv
-        gl.glPushMatrix()
-        gl.glTranslatef(self.x, self.y, self.z)
-        gl.glRotatef(self.ry,0,1,0)
-        self.vertex_list.draw(gl.GL_LINES)
-        gl.glPopMatrix()
-
-class Border (object):
-    def __init__ (self, width, height, color=(255,255,255)):
-        points = [0,0,0,0,height,0,0,height,0,width,height,0,width,height,0,width,0,0,width,0,0,0,0,0]
-        for n in xrange(len(points)/3):
-            points[n*3] += width/-2
-            points[n*3+1] += height/-2
-        self.vertex_list = pyglet.graphics.vertex_list(8,
-            ('v3f/static', points),
-            ('c3B/static', color*8))
-            
-    def update (self):
-        self.vertex_list.draw(gl.GL_LINES)
+import math, pyglet
 
 class Model (object):
-    scale = 1.0
+    scale = 1.
+    color = (1.,1.,1.)
     def __init__ (self, x=0, y=0, z=0):
         self.x = x
         self.y = y
         self.z = z
         
-    def update (self):
+    def draw (self):
         gl.glColor3f(*self.color)
         gl.glPushMatrix()
         gl.glTranslatef(self.x, self.y, self.z)
         gl.glScalef(self.scale, self.scale, self.scale)
         for list in self.vertex_lists:
-            list.draw(gl.GL_LINES )
+            list.draw(gl.GL_LINES)
         gl.glPopMatrix()
         
 class TerrainModel (Model):
@@ -139,6 +77,25 @@ class DroneModel (Model):
         self.x = 200 * math.sin(step+self.z/200.0)
         super(DroneModel, self).update()
 
+class PlayerBulletModel (Model):
+    color = (1, 1, 0)
+    vertex_lists = [
+        pyglet.graphics.vertex_list(6, ('v3f/static', (-10, 0, 5, 0, 0, -5, 0, 0, -5, 10, 0, 5, 10, 0, 5, -10, 0, 5)))
+    ]
+    
+    def __init__ (self, *args, **kwargs):
+        super(PlayerBulletModel, self).__init__(*args, **kwargs)
+        self.vz = -15
+        #~ self.decay = 1
+        #~ self.fire_delay = .25
+        #~ self.timestamp = 0
+        
+    def update (self, step):
+        #self.x = 200 * math.sin(step+self.z/200.0)
+        self.z = self.z + self.vz
+        # self.vx *= self.decay
+        super(PlayerBulletModel, self).update()
+    
 class PlayerDroneModel (Model):
     scale = 0.5
     color = (0, 1, 0)
@@ -154,6 +111,8 @@ class PlayerDroneModel (Model):
         super(PlayerDroneModel, self).__init__(*args, **kwargs)
         self.vx = 0
         self.decay = 1
+        self.fire_delay = .25
+        self.timestamp = 0
         
     def update (self, step):
         #self.x = 200 * math.sin(step+self.z/200.0)
@@ -175,73 +134,8 @@ class PlayerDroneModel (Model):
         elif self.vx > 0:
             self.decay = 0.9
         
-class Window (pyglet.window.Window):
-    def __init__ (self, *args, **kwargs):
-        super(Window, self).__init__(*args, **kwargs)
-        self.camera = Camera()
-        self.axis = Axis(40+self.width/-2, 40+self.height/-2, 0)
-        self.border = Border(self.width-32, self.height-32)
-        self.models = []
-        for n in xrange(14):
-            self.models.append(DroneModel(n*-100, -100, -300 + n*-110))
-        self.terrain = TerrainModel(0,self.height/-4)
-        self.player = PlayerDroneModel(0, -100, -100)
-        self.cage = TerrainCage()
-        #~ gl.glEnable(gl.GL_BLEND)
-        #~ gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
-        #~ gl.glDepthFunc(gl.GL_LEQUAL)
-        pyglet.clock.schedule(self.update)
-        self.clock = pyglet.clock.ClockDisplay()
-        self.step = 0.0
-        
-    def update (self, dt):
-        self.step += 0.01
-        
-    def on_resize (self, width, height):
-        self.camera.defaultView(width, height)
-        
-    def on_draw (self):
-        self.clear()
-        self.camera.update()
-        self.border.update()
-        gl.glEnable(gl.GL_DEPTH_TEST)
-        self.axis.update()
-        self.cage.update()
-        self.terrain.update()
-        for model in self.models:
-            model.update(self.step)
-        self.player.update(self.step)
-        gl.glDisable(gl.GL_DEPTH_TEST)
-        gl.glTranslatef(self.width/2-160, self.height/-2+20, 0)
-        self.clock.draw()
-        
-    def on_key_press (self, symbol, modifiers):
-        super(Window, self).on_key_press(symbol, modifiers)
-        if symbol == pyglet.window.key.A:
-            self.player.move_left(1)
-        elif symbol == pyglet.window.key.D:
-            self.player.move_right(1)
-        
-    def on_key_release (self, symbol, modifiers):
-        if symbol == pyglet.window.key.A:
-            self.player.move_left(0)
-        elif symbol == pyglet.window.key.D:
-            self.player.move_right(0)
-        
-    def on_mouse_drag (self, x, y, dx, dy, button, modifiers):
-        if button==1:
-            self.camera.x-=dx*2
-            self.camera.y-=dy*2
-        elif button==2:
-            self.camera.x-=dx*2
-            self.camera.z-=dy*2
-        elif button==4:
-            self.camera.ry+=dx/4.
-            self.camera.rx-=dy/4.
-       
-def main ():
-    window = Window(900, 555)
-    pyglet.app.run()
-    
-if __name__ == '__main__':
-    main()
+    def fire (self, now):
+        if now > self.timestamp:
+            self.timestamp = now + self.fire_delay
+            return (PlayerBulletModel(self.x-40, self.y, self.z-18), PlayerBulletModel(self.x+40, self.y, self.z-18))
+        return None
