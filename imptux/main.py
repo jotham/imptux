@@ -280,12 +280,16 @@ class TuxImperium (object):
         self.window = window
         self.window.push_handlers(self.on_key_release)
         self.current_scene = None
-        self.profiler = profiler.GProfiler()
+        self.profiler = None
     
     def on_key_release (self, symbol, modifiers):
         if symbol == pyglet.window.key.ESCAPE:
             pyglet.app.exit()
         elif symbol == pyglet.window.key.G:
+            # FYI: Wont work if you don't have PyGTK
+            if self.profiler:
+                self.profiler.destroy()
+            self.profiler = profiler.GProfiler()
             self.profiler.show()
             return pyglet.event.EVENT_HANDLED
         elif symbol == pyglet.window.key.G:
