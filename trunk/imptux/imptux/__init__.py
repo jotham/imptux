@@ -1,7 +1,11 @@
 import pyglet, models
 from pyglet import gl
+import ctypes
+
 
 class Camera (object):
+    #~ fog_color = ctypes.cast((gl.GLfloat*4)(0,0,0.0,0), ctypes.POINTER(gl.GLfloat))
+    
     def __init__ (self):
         self.fieldofview = 60
         self.clipnear = 0.1
@@ -21,6 +25,14 @@ class Camera (object):
         gl.glLoadIdentity()
         gl.gluPerspective(self.fieldofview, self.width/float(self.height), self.clipnear, self.clipfar)
         gl.glMatrixMode(gl.GL_MODELVIEW)
+        # Fog
+        #~ gl.glFogi(gl.GL_FOG_MODE, gl.GL_LINEAR)
+        #~ gl.glFogfv(gl.GL_FOG_COLOR, self.fog_color)
+        #~ gl.glFogf(gl.GL_FOG_DENSITY, 0.35)
+        #~ gl.glHint(gl.GL_FOG_HINT, gl.GL_DONT_CARE)
+        #~ gl.glFogf(gl.GL_FOG_START, 1500.0)
+        #~ gl.glFogf(gl.GL_FOG_END, 2300.0)
+        #~ gl.glEnable(gl.GL_FOG)
         
     def update (self):
         pass
