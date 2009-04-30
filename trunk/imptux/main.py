@@ -1,4 +1,5 @@
-import imptux, pyglet, time, math
+import imptux, pyglet, time, math, random
+from imptux import profiler
 from pyglet import gl
 
 class Terrain (object):
@@ -153,7 +154,7 @@ class Player (object):
             #~ self.c = 1
             return (PlayerBulletModel(self.x-40, self.y, self.z-18),PlayerBulletModel(self.x+40, self.y, self.z-18))
         return None
-
+    
 class GameScene (object):
     def __init__ (self, window, framerate=60.0):
         self.window = window
@@ -185,7 +186,6 @@ class GameScene (object):
         pyglet.clock.schedule_interval(self.dispatch_enemy, 2)
         self.dispatch_enemy(0)
         
-        
     def dispatch_enemy (self, dt):
         for n in xrange(4):
             self.collision_entities.append(EnemyDrone(n*-100, -200, -2000 + n*-110))
@@ -211,7 +211,6 @@ class GameScene (object):
         self.camera.update()
         self.window.invalid = True
         
-    
     def player_fire (self):
         munition_objects = self.player.fire(time.time())
         if munition_objects:
@@ -235,8 +234,6 @@ class GameScene (object):
         self.window.invalid = False
         
     def on_key_press (self, symbol, modifiers):
-        if symbol == pyglet.window.key.ESCAPE:
-            pyglet.app.exit()
         if symbol == pyglet.window.key.A:
             self.player.move_left(1)
         elif symbol == pyglet.window.key.D:
@@ -252,8 +249,6 @@ class GameScene (object):
         elif symbol == pyglet.window.key.C:
             print 'self.camera.x, self.camera.y, self.camera.z = (%s, %s, %s)' % (self.camera.x, self.camera.y, self.camera.z)
             print 'self.camera.rx, self.camera.ry = (%s, %s)' % (self.camera.rx, self.camera.ry)
-        elif symbol == pyglet.window.key.G:
-            pyglet.image.get_buffer_manager().get_color_buffer().save('screenshot-%d.png' % (int(time.time())))
         
     def on_mouse_press (self, x, y, button, modifiers):
         if button == pyglet.window.mouse.LEFT:
@@ -283,7 +278,19 @@ class GameScene (object):
 class TuxImperium (object):
     def __init__ (self, window):
         self.window = window
+        self.window.push_handlers(self.on_key_release)
         self.current_scene = None
+        self.profiler = profiler.GProfiler()
+    
+    def on_key_release (self, symbol, modifiers):
+        if symbol == pyglet.window.key.ESCAPE:
+            pyglet.app.exit()
+        elif symbol == pyglet.window.key.G:
+            self.profiler.show()
+            return pyglet.event.EVENT_HANDLED
+        elif symbol == pyglet.window.key.G:
+            pyglet.image.get_buffer_manager().get_color_buffer().save('screenshot-%d.png' % (int(time.time())))
+            return pyglet.event.EVENT_HANDLED
         
     def scene_game(self):
         if self.current_scene:
@@ -291,6 +298,7 @@ class TuxImperium (object):
         self.current_scene = GameScene(self.window)
 
 def main ():
+    profiler.pyglet()    
     game = TuxImperium(pyglet.window.Window(900, 555))
     game.scene_game()
     pyglet.app.run()
