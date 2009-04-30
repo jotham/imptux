@@ -1,5 +1,6 @@
-import imptux, pyglet, time, math, random
+import imptux, pyglet, time, math, random, platform
 from pyglet import gl
+from distutils.version import LooseVersion
 
 GPROFILER_ERROR = None
 try:
@@ -296,6 +297,8 @@ class TuxImperium (object):
         elif symbol == pyglet.window.key.G:
             pyglet.image.get_buffer_manager().get_color_buffer().save('screenshot-%d.png' % (int(time.time())))
             return pyglet.event.EVENT_HANDLED
+        elif symbol == pyglet.window.key.F:
+            self.window.set_fullscreen(not self.window.fullscreen)
     
     def show_profiler (self):
         # FYI: Wont work if you don't have PyGTK
@@ -313,8 +316,15 @@ class TuxImperium (object):
         self.current_scene = GameScene(self.window)
 
 def main ():
-    if not GPROFILER_ERROR: profiler.pyglet()    
-    game = TuxImperium(pyglet.window.Window(900, 555))
+    if LooseVersion(platform.python_version()) < LooseVersion('2.4'):
+        print 'Warning: python version %s is unsupported.' % platform.python_version()
+    if LooseVersion(pyglet.version) < LooseVersion('1.1.2') :
+        print 'Warning: pyglet version %s is unsupported.' % pyglet.version
+    if GPROFILER_ERROR:
+        print 'Failed to initialize profiler (%s)' % GPROFILER_ERROR
+    else:
+        profiler.pyglet()
+    game = TuxImperium(pyglet.window.Window(1000, 678))
     game.scene_game()
     pyglet.app.run()
     
