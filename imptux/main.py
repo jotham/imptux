@@ -8,8 +8,83 @@ try:
 except ImportError, e:
     GPROFILER_ERROR = e
 
+# generate displacement map for terrain cage
+displacement_resolution = 1024
+displacement_resolution_ = displacement_resolution - 1
+displacement_map = []
+for n in xrange(displacement_resolution):
+    angle = math.pi * 1.33 + n/float(displacement_resolution) * math.pi/2.9
+    displacement_map.append(((angle-math.pi/2)*180/math.pi, 600*math.cos(angle), 600*math.sin(angle)+358))
+def get_displacement (n):
+    set = int(((n + 220) / 440.0)*displacement_resolution_)
+    return displacement_map[set][0], displacement_map[set][1], displacement_map[set][2]
+
+def prepare (xo,yo,zo,xs,ys,zs,v):
+    return_list = []
+    for n in xrange(len(v)/3):
+        return_list.extend([xo+v[n*3]*xs,yo+v[n*3+1]*ys,zo+v[n*3+2]*zs])
+    return return_list
+
+PLAYER_VERTEX_LIST = (-50.0, 10.000002, 0.0, 50.0, 10.000002, 0.0, 50.0, 10.000002, 0.0, 50.0, -9.999998, 0.0, 50.0, -9.999998, 0.0, -50.0, -9.999998, 0.0, -50.0, -9.999998, 0.0, -50.0, 10.000002, 0.0, 50.0, -9.999998, 0.0, 50.0, 10.000002, 0.0, 50.0, 10.000002, 0.0, 0.0, -2e-06, -100.0, 0.0, -2e-06, -100.0, 50.0, -9.999998, 0.0, 50.0, 10.000002, 0.0, -50.0, 10.000002, 0.0, -50.0, 10.000002, 0.0, 0.0, -2e-06, -100.0, 0.0, -2e-06, -100.0, 50.0, 10.000002, 0.0, -50.0, 10.000002, 0.0, -50.0, -9.999998, 0.0, -50.0, -9.999998, 0.0, 0.0, -2e-06, -100.0, 0.0, -2e-06, -100.0, -50.0, 10.000002, 0.0, -50.0, -9.999998, 0.0, 50.0, -9.999998, 0.0, 50.0, -9.999998, 0.0, 0.0, -2e-06, -100.0, 0.0, -2e-06, -100.0, -50.0, -9.999998, 0.0)
+TERRAIN_VERTEX_LIST = (-400, 30, -2000, -330, 30, -2000, -330, 30, -2000, -330, 30, 0, -330, 30, 0, -400, 30, 0, -400, 30, 0, -400, 30, -2000, -330, 30, -2000, -324.956177, 29.579521, -2000, -324.956177, 29.579521, -2000, -324.956177, 29.579521, 0, -324.956177, 29.579521, 0, -330, 30, 0, -330, 30, 0, -330, 30, -2000, -324.956177, 29.579521, -2000, -319.409271, 28.364159, -2000, -319.409271, 28.364159, -2000, -319.409271, 28.364159, 0, -319.409271, 28.364159, 0, -324.956177, 29.579521, 0, -324.956177, 29.579521, 0, -324.956177, 29.579521, -2000, -319.409271, 28.364159, -2000, -310.095367, 25.20192, -2000, -310.095367, 25.20192, -2000, -310.095367, 25.20192, 0, -310.095367, 25.20192, 0, -319.409271, 28.364159, 0, -319.409271, 28.364159, 0, -319.409271, 28.364159, -2000, -310.095367, 25.20192, -2000, -283.322876, 12.78336, -2000, -283.322876, 12.78336, -2000, -283.322876, 12.78336, 0, -283.322876, 12.78336, 0, -310.095367, 25.20192, 0, -310.095367, 25.20192, 0, -310.095367, 25.20192, -2000, -283.322876, 12.78336, -2000, -205.223038, -23.061121, -2000, -205.223038, -23.061121, -2000, -205.223038, -23.061121, 0, -205.223038, -23.061121, 0, -283.322876, 12.78336, 0, -283.322876, 12.78336, 0, -283.322876, 12.78336, -2000, -205.223038, -23.061121, -2000, -160.174072, -38.25024, -2000, -160.174072, -38.25024, -2000, -160.174072, -38.25024, 0, -160.174072, -38.25024, 0, -205.223038, -23.061121, 0, -205.223038, -23.061121, 0, -205.223038, -23.061121, -2000, -160.174072, -38.25024, -2000, -107.280006, -50.640003, -2000, -107.280006, -50.640003, -2000, -107.280006, -50.640003, 0, -107.280006, -50.640003, 0, -160.174072, -38.25024, 0, -160.174072, -38.25024, 0, -160.174072, -38.25024, -2000, -107.280006, -50.640003, -2000, -56.760002, -57.48, -2000, -56.760002, -57.48, -2000, -56.760002, -57.48, 0, -56.760002, -57.48, 0, -107.280006, -50.640003, 0, -107.280006, -50.640003, 0, -107.280006, -50.640003, -2000, -56.760002, -57.48, -2000, 0, -60, -2000, 0, -60, -2000, 0, -60, 0, 0, -60, 0, -56.760002, -57.48, 0, -56.760002, -57.48, 0, -56.760002, -57.48, -2000, 0, -60, -2000, 56.400002, -57.48, -2000, 56.400002, -57.48, -2000, 56.400002, -57.48, 0, 56.400002, -57.48, 0, 0, -60, 0, 0, -60, 0, 0, -60, -2000, 56.400002, -57.48, -2000, 106.000008, -50.640003, -2000, 106.000008, -50.640003, -2000, 106.000008, -50.640003, 0, 106.000008, -50.640003, 0, 56.400002, -57.48, 0, 56.400002, -57.48, 0, 56.400002, -57.48, -2000, 106.000008, -50.640003, -2000, 149.400009, -40.559998, -2000, 149.400009, -40.559998, -2000, 149.400009, -40.559998, 0, 149.400009, -40.559998, 0, 106.000008, -50.640003, 0, 106.000008, -50.640003, 0, 106.000008, -50.640003, -2000, 149.400009, -40.559998, -2000, 194.140793, -25.70784, -2000, 194.140793, -25.70784, -2000, 194.140793, -25.70784, 0, 194.140793, -25.70784, 0, 149.400009, -40.559998, 0, 149.400009, -40.559998, 0, 149.400009, -40.559998, -2000, 194.140793, -25.70784, -2000, 248.400009, -1.68, -2000, 248.400009, -1.68, -2000, 248.400009, -1.68, 0, 248.400009, -1.68, 0, 194.140793, -25.70784, 0, 194.140793, -25.70784, 0, 194.140793, -25.70784, -2000, 248.400009, -1.68, -2000, 302.198395, 23.825281, -2000, 302.198395, 23.825281, -2000, 302.198395, 23.825281, 0, 302.198395, 23.825281, 0, 248.400009, -1.68, 0, 248.400009, -1.68, 0, 248.400009, -1.68, -2000, 302.198395, 23.825281, -2000, 313.200012, 27.48, -2000, 313.200012, 27.48, -2000, 313.200012, 27.48, 0, 313.200012, 27.48, 0, 302.198395, 23.825281, 0, 302.198395, 23.825281, 0, 302.198395, 23.825281, -2000, 313.200012, 27.48, -2000, 320.126404, 29.066881, -2000, 320.126404, 29.066881, -2000, 320.126404, 29.066881, 0, 320.126404, 29.066881, 0, 313.200012, 27.48, 0, 313.200012, 27.48, 0, 313.200012, 27.48, -2000, 320.126404, 29.066881, -2000, 323.481598, 29.579521, -2000, 323.481598, 29.579521, -2000, 323.481598, 29.579521, 0, 323.481598, 29.579521, 0, 320.126404, 29.066881, 0, 320.126404, 29.066881, 0, 320.126404, 29.066881, -2000, 323.481598, 29.579521, -2000, 330, 30, -2000, 330, 30, -2000, 330, 30, 0, 330, 30, 0, 323.481598, 29.579521, 0, 323.481598, 29.579521, 0, 323.481598, 29.579521, -2000, 330, 30, -2000, 400, 30, -2000, 400, 30, -2000, 400, 30, 0, 400, 30, 0, 330, 30, 0, 330, 30, 0, 330, 30, -2000)
+ENEMY_VERTEX_LIST = (-50.0, 10.000002, -100.0, 50.0, 10.000002, -100.0, 50.0, 10.000002, -100.0, 50.0, -9.999998, -100.0, 50.0, -9.999998, -100.0, -50.0, -9.999998, -100.0, -50.0, -9.999998, -100.0, -50.0, 10.000002, -100.0, 50.0, -9.999998, -100.0, 50.0, 10.000002, -100.0, 50.0, 10.000002, -100.0, 0.0, -2e-06, 0.0, 0.0, -2e-06, 0.0, 50.0, -9.999998, -100.0, 50.0, 10.000002, -100.0, -50.0, 10.000002, -100.0, -50.0, 10.000002, -100.0, 0.0, -2e-06, 0.0, 0.0, -2e-06, 0.0, 50.0, 10.000002, -100.0, -50.0, 10.000002, -100.0, -50.0, -9.999998, -100.0, -50.0, -9.999998, -100.0, 0.0, -2e-06, 0.0, 0.0, -2e-06, 0.0, -50.0, 10.000002, -100.0, -50.0, -9.999998, -100.0, 50.0, -9.999998, -100.0, 50.0, -9.999998, -100.0, 0.0, -2e-06, 0.0, 0.0, -2e-06, 0.0, -50.0, -9.999998, -100.0)
+PLAYER_BULLET_VERTEX_LIST = (-10, 0, 5, 0, 0, -5, 0, 0, -5, 10, 0, 5, 10, 0, 5, -10, 0, 5)
+
+class Player (object):
+    model = pyglet.graphics.vertex_list(32,('v3f/static', prepare(0,0,0,0.5,0.5,0.5, PLAYER_VERTEX_LIST)))
+    
+    def __init__ (self, x, y, z):
+        self.x = x
+        self.y = y
+        self.z = z
+        self.vx = 0
+        self.decay = 1
+        self.iv = 550
+        self.fire_delay = .125
+        self.timestamp = 0
+        self.c = 0
+        self.boundsx = 200
+        self.update()
+        
+    def draw (self):
+        #~ gl.glColor3f(0.2*self.c, 0.6+.4*self.c, 0.2*self.c)
+        #~ self.c *= .9
+        gl.glColor3f(0.2, 0.7, 0)
+        gl.glPushMatrix()
+        gl.glTranslatef(self.virtual_x, self.virtual_y, self.z)
+        gl.glRotatef(self.virtual_rz,0,0,1)
+        self.model.draw(gl.GL_LINES)
+        gl.glPopMatrix()
+    
+    def update (self, dt=0):
+        self.x = max(-self.boundsx, min(self.boundsx, self.x + (self.vx * dt) ))
+        self.vx *= self.decay
+        self.virtual_rz, self.virtual_x, self.virtual_y = get_displacement(self.x)
+        return True
+        
+    def move_left (self, mode):
+        if mode == 1:
+            self.decay = 1
+            self.vx = -self.iv
+        elif self.vx < 0:
+            self.decay = 0.7
+            
+    def move_right (self, mode):
+        if mode == 1:
+            self.decay = 1
+            self.vx = self.iv
+        elif self.vx > 0:
+            self.decay = 0.7
+        
+    def fire (self, now):
+        if now > self.timestamp:
+            self.timestamp = now + self.fire_delay
+            #~ self.c = 1
+            return (PlayerBulletModel(self.x-16, self.y, self.z-15),PlayerBulletModel(self.x+16, self.y, self.z-15))
+        return None
+        
 class Terrain (object):
-    model = pyglet.graphics.vertex_list(168,('v3f/static', (-400, 30, -2000, -330, 30, -2000, -330, 30, -2000, -330, 30, 0, -330, 30, 0, -400, 30, 0, -400, 30, 0, -400, 30, -2000, -330, 30, -2000, -324.956177, 29.579521, -2000, -324.956177, 29.579521, -2000, -324.956177, 29.579521, 0, -324.956177, 29.579521, 0, -330, 30, 0, -330, 30, 0, -330, 30, -2000, -324.956177, 29.579521, -2000, -319.409271, 28.364159, -2000, -319.409271, 28.364159, -2000, -319.409271, 28.364159, 0, -319.409271, 28.364159, 0, -324.956177, 29.579521, 0, -324.956177, 29.579521, 0, -324.956177, 29.579521, -2000, -319.409271, 28.364159, -2000, -310.095367, 25.20192, -2000, -310.095367, 25.20192, -2000, -310.095367, 25.20192, 0, -310.095367, 25.20192, 0, -319.409271, 28.364159, 0, -319.409271, 28.364159, 0, -319.409271, 28.364159, -2000, -310.095367, 25.20192, -2000, -283.322876, 12.78336, -2000, -283.322876, 12.78336, -2000, -283.322876, 12.78336, 0, -283.322876, 12.78336, 0, -310.095367, 25.20192, 0, -310.095367, 25.20192, 0, -310.095367, 25.20192, -2000, -283.322876, 12.78336, -2000, -205.223038, -23.061121, -2000, -205.223038, -23.061121, -2000, -205.223038, -23.061121, 0, -205.223038, -23.061121, 0, -283.322876, 12.78336, 0, -283.322876, 12.78336, 0, -283.322876, 12.78336, -2000, -205.223038, -23.061121, -2000, -160.174072, -38.25024, -2000, -160.174072, -38.25024, -2000, -160.174072, -38.25024, 0, -160.174072, -38.25024, 0, -205.223038, -23.061121, 0, -205.223038, -23.061121, 0, -205.223038, -23.061121, -2000, -160.174072, -38.25024, -2000, -107.280006, -50.640003, -2000, -107.280006, -50.640003, -2000, -107.280006, -50.640003, 0, -107.280006, -50.640003, 0, -160.174072, -38.25024, 0, -160.174072, -38.25024, 0, -160.174072, -38.25024, -2000, -107.280006, -50.640003, -2000, -56.760002, -57.48, -2000, -56.760002, -57.48, -2000, -56.760002, -57.48, 0, -56.760002, -57.48, 0, -107.280006, -50.640003, 0, -107.280006, -50.640003, 0, -107.280006, -50.640003, -2000, -56.760002, -57.48, -2000, 0, -60, -2000, 0, -60, -2000, 0, -60, 0, 0, -60, 0, -56.760002, -57.48, 0, -56.760002, -57.48, 0, -56.760002, -57.48, -2000, 0, -60, -2000, 56.400002, -57.48, -2000, 56.400002, -57.48, -2000, 56.400002, -57.48, 0, 56.400002, -57.48, 0, 0, -60, 0, 0, -60, 0, 0, -60, -2000, 56.400002, -57.48, -2000, 106.000008, -50.640003, -2000, 106.000008, -50.640003, -2000, 106.000008, -50.640003, 0, 106.000008, -50.640003, 0, 56.400002, -57.48, 0, 56.400002, -57.48, 0, 56.400002, -57.48, -2000, 106.000008, -50.640003, -2000, 149.400009, -40.559998, -2000, 149.400009, -40.559998, -2000, 149.400009, -40.559998, 0, 149.400009, -40.559998, 0, 106.000008, -50.640003, 0, 106.000008, -50.640003, 0, 106.000008, -50.640003, -2000, 149.400009, -40.559998, -2000, 194.140793, -25.70784, -2000, 194.140793, -25.70784, -2000, 194.140793, -25.70784, 0, 194.140793, -25.70784, 0, 149.400009, -40.559998, 0, 149.400009, -40.559998, 0, 149.400009, -40.559998, -2000, 194.140793, -25.70784, -2000, 248.400009, -1.68, -2000, 248.400009, -1.68, -2000, 248.400009, -1.68, 0, 248.400009, -1.68, 0, 194.140793, -25.70784, 0, 194.140793, -25.70784, 0, 194.140793, -25.70784, -2000, 248.400009, -1.68, -2000, 302.198395, 23.825281, -2000, 302.198395, 23.825281, -2000, 302.198395, 23.825281, 0, 302.198395, 23.825281, 0, 248.400009, -1.68, 0, 248.400009, -1.68, 0, 248.400009, -1.68, -2000, 302.198395, 23.825281, -2000, 313.200012, 27.48, -2000, 313.200012, 27.48, -2000, 313.200012, 27.48, 0, 313.200012, 27.48, 0, 302.198395, 23.825281, 0, 302.198395, 23.825281, 0, 302.198395, 23.825281, -2000, 313.200012, 27.48, -2000, 320.126404, 29.066881, -2000, 320.126404, 29.066881, -2000, 320.126404, 29.066881, 0, 320.126404, 29.066881, 0, 313.200012, 27.48, 0, 313.200012, 27.48, 0, 313.200012, 27.48, -2000, 320.126404, 29.066881, -2000, 323.481598, 29.579521, -2000, 323.481598, 29.579521, -2000, 323.481598, 29.579521, 0, 323.481598, 29.579521, 0, 320.126404, 29.066881, 0, 320.126404, 29.066881, 0, 320.126404, 29.066881, -2000, 323.481598, 29.579521, -2000, 330, 30, -2000, 330, 30, -2000, 330, 30, 0, 330, 30, 0, 323.481598, 29.579521, 0, 323.481598, 29.579521, 0, 323.481598, 29.579521, -2000, 330, 30, -2000, 400, 30, -2000, 400, 30, -2000, 400, 30, 0, 400, 30, 0, 330, 30, 0, 330, 30, 0, 330, 30, -2000)))
+    model = pyglet.graphics.vertex_list(168,('v3f/static', prepare(0,0,0,1,1,3,TERRAIN_VERTEX_LIST)))
     
     def __init__ (self, x, y, z):
         self.x = x
@@ -27,17 +102,17 @@ class Terrain (object):
         gl.glPopMatrix()
 
 class EnemyDrone (object):
-    model = pyglet.graphics.vertex_list(32,('v3f/static', (-50.0, 10.000002, -100.0, 50.0, 10.000002, -100.0, 50.0, 10.000002, -100.0, 50.0, -9.999998, -100.0, 50.0, -9.999998, -100.0, -50.0, -9.999998, -100.0, -50.0, -9.999998, -100.0, -50.0, 10.000002, -100.0, 50.0, -9.999998, -100.0, 50.0, 10.000002, -100.0, 50.0, 10.000002, -100.0, 0.0, -2e-06, 0.0, 0.0, -2e-06, 0.0, 50.0, -9.999998, -100.0, 50.0, 10.000002, -100.0, -50.0, 10.000002, -100.0, -50.0, 10.000002, -100.0, 0.0, -2e-06, 0.0, 0.0, -2e-06, 0.0, 50.0, 10.000002, -100.0, -50.0, 10.000002, -100.0, -50.0, -9.999998, -100.0, -50.0, -9.999998, -100.0, 0.0, -2e-06, 0.0, 0.0, -2e-06, 0.0, -50.0, 10.000002, -100.0, -50.0, -9.999998, -100.0, 50.0, -9.999998, -100.0, 50.0, -9.999998, -100.0, 0.0, -2e-06, 0.0, 0.0, -2e-06, 0.0, -50.0, -9.999998, -100.0)))
+    model = pyglet.graphics.vertex_list(32,('v3f/static', prepare(0,0,0,0.5,0.5,0.5,ENEMY_VERTEX_LIST)))
     
     def __init__ (self, x, y, z):
         self.x = x
         self.y = y
         self.z = z
         self.rz = 0
-        self.vz = 300
+        self.vz = 400
         self.health = 2
         self.step = 0
-        self.step_rate = math.pi/2
+        self.step_rate = math.pi/4
         self.c = 0
         self.update()
         
@@ -47,11 +122,12 @@ class EnemyDrone (object):
         self.step += self.step_rate * dt
         self.x = 200 * math.sin(self.step+self.z/200.0)
         self.z += self.vz * dt
-        self.left = self.x - 50
-        self.right = self.x + 50
+        self.left = self.x - 25 # 50
+        self.right = self.x + 25 # 50
         self.top = self.z + 0
-        self.bottom = self.z - 100
+        self.bottom = self.z - 50 # 100
         self.c *= .9
+        self.virtual_rz, self.virtual_x, self.virtual_y = get_displacement(self.x)
         return True
     
     def draw (self):
@@ -61,8 +137,8 @@ class EnemyDrone (object):
             #~ self.top, self.right, self.y, self.top, self.right, self.y, self.top, self.right, self.y,
             #~ self.bottom, self.right, self.y, self.bottom, self.left, self.y, self.bottom))).draw(gl.GL_LINES)
         gl.glPushMatrix()
-        gl.glTranslatef(self.x, self.y, self.z)
-        gl.glRotatef(self.rz,0,0,1)
+        gl.glTranslatef(self.virtual_x, self.virtual_y, self.z)
+        gl.glRotatef(self.virtual_rz,0,0,1)
         gl.glColor3f(1.0, self.c, 0)
         self.model.draw(gl.GL_LINES)
         gl.glPopMatrix()
@@ -74,12 +150,14 @@ class EnemyDrone (object):
         self.health -= 1
         
 class PlayerBulletModel (object):
-    model = pyglet.graphics.vertex_list(6, ('v3f/static', (-10, 0, 5, 0, 0, -5, 0, 0, -5, 10, 0, 5, 10, 0, 5, -10, 0, 5)))
+    model = pyglet.graphics.vertex_list(6, ('v3f/static', prepare(0,0,0,0.5,0.5,0.5,PLAYER_BULLET_VERTEX_LIST)))
     
     def __init__ (self, x, y, z):
         self.x = x
         self.y = y
         self.z = z
+        self.rz = 0
+        self.vrz = 0
         self.vz = -650
         self.boundsz = -2000
         self.active = True
@@ -89,10 +167,12 @@ class PlayerBulletModel (object):
         if not self.active or self.z < self.boundsz:
             return False
         self.z += self.vz * dt
-        self.left = self.x - 10
-        self.right = self.x + 10
-        self.top = self.z + 5
-        self.bottom = self.z - 5
+        self.left = self.x - 5#10
+        self.right = self.x + 5#10
+        self.top = self.z + 2.5#5
+        self.bottom = self.z - 2.5#5
+        self.rz += self.vrz * dt
+        self.virtual_rz, self.virtual_x, self.virtual_y = get_displacement(self.x)
         return True
     
     def collision (self, entity):
@@ -106,61 +186,11 @@ class PlayerBulletModel (object):
             #~ self.bottom, self.right, self.y, self.bottom, self.left, self.y, self.bottom))).draw(gl.GL_LINES)
         gl.glColor3f(1, 0.8, 0)
         gl.glPushMatrix()
-        gl.glTranslatef(self.x, self.y, self.z)
+        gl.glTranslatef(self.virtual_x, self.virtual_y, self.z)
+        gl.glRotatef(self.virtual_rz+self.rz,0,0,1)
         self.model.draw(gl.GL_LINES)
         gl.glPopMatrix()
-    
-
-class Player (object):
-    model = pyglet.graphics.vertex_list(32,('v3f/static', (-50.0, 10.000002, 0.0, 50.0, 10.000002, 0.0, 50.0, 10.000002, 0.0, 50.0, -9.999998, 0.0, 50.0, -9.999998, 0.0, -50.0, -9.999998, 0.0, -50.0, -9.999998, 0.0, -50.0, 10.000002, 0.0, 50.0, -9.999998, 0.0, 50.0, 10.000002, 0.0, 50.0, 10.000002, 0.0, 0.0, -2e-06, -100.0, 0.0, -2e-06, -100.0, 50.0, -9.999998, 0.0, 50.0, 10.000002, 0.0, -50.0, 10.000002, 0.0, -50.0, 10.000002, 0.0, 0.0, -2e-06, -100.0, 0.0, -2e-06, -100.0, 50.0, 10.000002, 0.0, -50.0, 10.000002, 0.0, -50.0, -9.999998, 0.0, -50.0, -9.999998, 0.0, 0.0, -2e-06, -100.0, 0.0, -2e-06, -100.0, -50.0, 10.000002, 0.0, -50.0, -9.999998, 0.0, 50.0, -9.999998, 0.0, 50.0, -9.999998, 0.0, 0.0, -2e-06, -100.0, 0.0, -2e-06, -100.0, -50.0, -9.999998, 0.0)))
-    
-    def __init__ (self, x, y, z):
-        self.x = x
-        self.y = y
-        self.z = z
-        self.vx = 0
-        self.decay = 1
-        self.iv = 350
-        self.fire_delay = .125
-        self.timestamp = 0
-        self.c = 0
-        self.boundsx = 200
         
-    def draw (self):
-        #~ gl.glColor3f(0.2*self.c, 0.6+.4*self.c, 0.2*self.c)
-        #~ self.c *= .9
-        gl.glColor3f(0, 0.8, 0)
-        gl.glPushMatrix()
-        gl.glTranslatef(self.x, self.y, self.z)
-        self.model.draw(gl.GL_LINES)
-        gl.glPopMatrix()
-    
-    def update (self, dt):
-        self.x = max(-self.boundsx, min(self.boundsx, self.x + (self.vx * dt) ))
-        self.vx *= self.decay
-        return True
-        
-    def move_left (self, mode):
-        if mode == 1:
-            self.decay = 1
-            self.vx = -self.iv
-        elif self.vx < 0:
-            self.decay = 0.9
-            
-    def move_right (self, mode):
-        if mode == 1:
-            self.decay = 1
-            self.vx = self.iv
-        elif self.vx > 0:
-            self.decay = 0.9
-        
-    def fire (self, now):
-        if now > self.timestamp:
-            self.timestamp = now + self.fire_delay
-            #~ self.c = 1
-            return (PlayerBulletModel(self.x-40, self.y, self.z-18),PlayerBulletModel(self.x+40, self.y, self.z-18))
-        return None
-    
 class GameScene (object):
     def __init__ (self, window, framerate=60.0):
         self.window = window
@@ -170,9 +200,21 @@ class GameScene (object):
         self.window.push_handlers(self)
         self.camera = imptux.Camera()
         
-        self.camera.x, self.camera.y, self.camera.z = (4, -48, 320)
-        self.camera.rx, self.camera.ry = (14.75, -1.5)
-        
+        self.window.set_exclusive_mouse()
+        #~ self.camera.x, self.camera.y, self.camera.z = (4, -48, 320)
+        #~ self.camera.rx, self.camera.ry = (14.75, -1.5)
+        #~ self.camera.x, self.camera.y, self.camera.z = (-6, -48, 602)
+        #~ self.camera.rx, self.camera.ry = (12.0, -6.25)
+        #~ self.camera.x, self.camera.y, self.camera.z = (-2, -242, 602)
+        #~ self.camera.rx, self.camera.ry = (0.0, -0.25)
+        #~ self.camera.x, self.camera.y, self.camera.z = (0, -64, 300)
+        #~ self.camera.rx, self.camera.ry = (14.75, 0.0)
+        #~ self.camera.x, self.camera.y, self.camera.z = (0, -138, 300)
+        #~ self.camera.rx, self.camera.ry = (4.0, 0.0)
+        self.camera.fieldofview = 90
+        self.camera.x, self.camera.y, self.camera.z = (0, -138, 134)
+        self.camera.rx, self.camera.ry = (4.0, 0.0)
+
         self.clock = pyglet.clock.ClockDisplay()
         self.new_game()
         
@@ -187,7 +229,7 @@ class GameScene (object):
         self.collision_entities = []
         self.munitions = []
         self.terrain = Terrain(0, -200, 0)
-        self.player = Player(0, -200, 0)
+        self.player = Player(0, 0, -50)
         pyglet.clock.schedule_interval(self.update_game, 1/self.framerate) 
         pyglet.clock.schedule_interval(self.dispatch_enemy, 2)
         self.dispatch_enemy(0)
@@ -225,17 +267,17 @@ class GameScene (object):
     def on_draw (self):
         self.window.clear()
         self.camera.position()
-        self.border.draw()
+        #~ self.border.draw()
         self.terrain.draw()
         gl.glEnable(gl.GL_DEPTH_TEST)
         for entity in self.collision_entities:
             entity.draw()
         for munition in self.munitions:
             munition.draw()
-        self.axis.draw()
+        #~ self.axis.draw()
         gl.glDisable(gl.GL_DEPTH_TEST)
         self.player.draw()
-        gl.glTranslatef(self.width/2-160, self.height/-2+20, 0)
+        gl.glTranslatef(280, 70, -100)
         self.clock.draw()
         self.window.invalid = False
         
@@ -294,7 +336,7 @@ class TuxImperium (object):
         elif symbol == pyglet.window.key.G:
             self.show_profiler()
             return pyglet.event.EVENT_HANDLED
-        elif symbol == pyglet.window.key.G:
+        elif symbol == pyglet.window.key.S:
             pyglet.image.get_buffer_manager().get_color_buffer().save('screenshot-%d.png' % (int(time.time())))
             return pyglet.event.EVENT_HANDLED
         elif symbol == pyglet.window.key.F:
@@ -324,7 +366,7 @@ def main ():
         print 'Failed to initialize profiler (%s)' % GPROFILER_ERROR
     else:
         profiler.pyglet()
-    game = TuxImperium(pyglet.window.Window(1000, 678))
+    game = TuxImperium(pyglet.window.Window(1000, 500))
     game.scene_game()
     pyglet.app.run()
     
