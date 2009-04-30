@@ -4,7 +4,7 @@ import ctypes
 
 
 class Camera (object):
-    #~ fog_color = ctypes.cast((gl.GLfloat*4)(0,0,0.0,0), ctypes.POINTER(gl.GLfloat))
+    fog_color = ctypes.cast((gl.GLfloat*4)(0,0,0.0,0), ctypes.POINTER(gl.GLfloat))
     
     def __init__ (self):
         self.fieldofview = 60
@@ -30,19 +30,22 @@ class Camera (object):
         #~ gl.glFogfv(gl.GL_FOG_COLOR, self.fog_color)
         #~ gl.glFogf(gl.GL_FOG_DENSITY, 0.35)
         #~ gl.glHint(gl.GL_FOG_HINT, gl.GL_DONT_CARE)
-        #~ gl.glFogf(gl.GL_FOG_START, 1500.0)
+        #~ gl.glFogf(gl.GL_FOG_START, 500.0)
         #~ gl.glFogf(gl.GL_FOG_END, 2300.0)
         #~ gl.glEnable(gl.GL_FOG)
         
     def update (self):
         pass
         
-    def position (self):
+    def position (self, target=None):
         gl.glLoadIdentity()
-        gl.glTranslatef(-self.x,-self.y,-self.z)
-        gl.glRotatef(self.rx,1,0,0)
-        gl.glRotatef(self.ry,0,1,0)
-        gl.glRotatef(self.rz,0,0,1)
+        if target:
+            gl.gluLookAt(self.x, self.y, self.z, target[0], target[1], target[2], 0, 1, 0)
+        else:
+            gl.glTranslatef(-self.x,-self.y,-self.z)
+            gl.glRotatef(self.rx,1,0,0)
+            gl.glRotatef(self.ry,0,1,0)
+            gl.glRotatef(self.rz,0,0,1)
         
 class Axis (object):
     def __init__ (self, x=0, y=0, z=0, size=100):

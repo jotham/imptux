@@ -212,8 +212,10 @@ class GameScene (object):
         #~ self.camera.x, self.camera.y, self.camera.z = (0, -138, 300)
         #~ self.camera.rx, self.camera.ry = (4.0, 0.0)
         self.camera.fieldofview = 90
-        self.camera.x, self.camera.y, self.camera.z = (0, -138, 134)
-        self.camera.rx, self.camera.ry = (4.0, 0.0)
+        #~ self.camera.x, self.camera.y, self.camera.z = (0, -138, 134)
+        #~ self.camera.rx, self.camera.ry = (4.0, 0.0)
+        self.camera.x, self.camera.y, self.camera.z = (39.1404673467, -128, 76)
+        self.camera.rx, self.camera.ry = (-18.75, -22.0)
 
         self.clock = pyglet.clock.ClockDisplay()
         self.new_game()
@@ -266,18 +268,21 @@ class GameScene (object):
                 
     def on_draw (self):
         self.window.clear()
-        self.camera.position()
-        #~ self.border.draw()
+        self.camera.x = self.player.x/1.5
+        self.camera.position((0, 0, -10000))
+        rz = self.player.x / 200.0
+        gl.glRotatef(-5*rz,0,0,1)
         self.terrain.draw()
         gl.glEnable(gl.GL_DEPTH_TEST)
         for entity in self.collision_entities:
             entity.draw()
         for munition in self.munitions:
             munition.draw()
-        #~ self.axis.draw()
         gl.glDisable(gl.GL_DEPTH_TEST)
         self.player.draw()
-        gl.glTranslatef(280, 70, -100)
+        # Draw UI
+        gl.glLoadIdentity()
+        gl.glTranslatef(self.width-140,self.height-60,-512)
         self.clock.draw()
         self.window.invalid = False
         
@@ -303,11 +308,10 @@ class GameScene (object):
             self.player_fire()
     
     def on_resize (self, width, height):
+        print 'resize'
         self.width = width
         self.height = height
         self.camera.defaultView(width, height)
-        self.border = imptux.Border(self.width-32, self.height-32)
-        self.axis = imptux.Axis(40+self.width/-2, 40+self.height/-2, 0)
         self.window.invalid = True
         return pyglet.event.EVENT_HANDLED
     
