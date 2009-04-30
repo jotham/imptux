@@ -47,7 +47,7 @@ class Axis (object):
         gl.glPushMatrix()
         gl.glTranslatef(self.x, self.y, self.z)
         gl.glRotatef(self.ry,0,1,0)
-        self.vertex_list.draw(gl.GL_LINES)
+        self.vertex_list.draw(gl.GL_QUADS)
         gl.glPopMatrix()
 
 class Border (object):
