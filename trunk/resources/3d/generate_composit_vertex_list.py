@@ -33,4 +33,4 @@ def main (filename, ox=0, oy=0, oz=0, sx=1, sy=1, sz=1):
     objfile.close()
     
 if __name__ == '__main__':
-    main('Model_Pillar.obj', 0, 0, -50, 0.5, 0.5, 0.5)
+    main('Model_Ship.obj')

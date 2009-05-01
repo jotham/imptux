@@ -31,7 +31,7 @@ class Camera (object):
         #~ gl.glFogf(gl.GL_FOG_DENSITY, 0.35)
         #~ gl.glHint(gl.GL_FOG_HINT, gl.GL_DONT_CARE)
         #~ gl.glFogf(gl.GL_FOG_START, 500.0)
-        #~ gl.glFogf(gl.GL_FOG_END, 2300.0)
+        #~ gl.glFogf(gl.GL_FOG_END, 7300.0)
         #~ gl.glEnable(gl.GL_FOG)
         
     def update (self):
