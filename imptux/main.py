@@ -77,7 +77,7 @@ class Player (object):
             self.decay = 0.7
         
     def fire (self, now):
-        if now > self.timestamp:
+        if True: # now > self.timestamp:
             self.timestamp = now + self.fire_delay
             #~ self.c = 1
             return (PlayerBulletModel(self.x-16, self.y, self.z-15),PlayerBulletModel(self.x+16, self.y, self.z-15))
@@ -190,7 +190,38 @@ class PlayerBulletModel (object):
         gl.glRotatef(self.virtual_rz+self.rz,0,0,1)
         self.model.draw(gl.GL_LINES)
         gl.glPopMatrix()
-        
+
+font_list = (
+    ('l25a__.TTF', 'Logic twenty-five A', 64),
+    ('1900805.ttf', '1900.80.5', 64),
+    ('airstrip.ttf', 'Airstrip Four', 64),
+    ('ATOMIC__.TTF', 'Atomic', 64),
+    ('Crashed Scoreboard.ttf', 'Crashed Scoreboard', 64),
+    ('cymptum.ttf', 'cymptums', 64),
+    ('D3Craftism.ttf', 'D3 Craftism', 64),
+    ('decoder.ttf', 'Decoder', 64),
+    ('DEETER__.TTF', 'Deeter', 128),
+    ('elecday.ttf', 'Election Day', 48),
+    ('ERTHQAKE.TTF', 'Erthqake', 64),
+    ('Finder.ttf', 'Finder', 64),
+    ('gaposiso.ttf', 'Gaposis Outline (BRK)', 64),
+    ('l25__.TTF', 'Logic twenty-five Normal', 48), 
+    ('ltr04.TTF', 'ltr-04:wireflame', 48),
+    ('Nervous.ttf', 'Nervous', 64),
+    ('OSCILLOS.TTF', 'Oscilloscope', 32),
+    ('parallello.ttf', 'Parallello', 48),
+    ('PIXEL-LI.TTF', 'pixellife', 48),
+    ('plasmati.ttf', 'Plasmatic', 48),
+    ('Radiof.ttf', 'Radio Space', 48),
+    ('REPUB2__.ttf', 'Republika II', 32),
+    ('REPUB4__.ttf', 'Republika IV', 32),
+    ('Techfontw.ttf', 'Tech Font Wide', 32),
+    ('zoetrope.ttf', 'Zoetrope (BRK)', 32),
+    ('Vectorb.ttf', 'Vector Battle', 64),
+    ('urcompo.ttf', 'Your Complex O BRK', 64),
+    ('WAYBEYONDBLUE.TTF', 'Way beyond blue', 64))
+ui_color = (200,50,0,255)
+
 class GameScene (object):
     def __init__ (self, window, framerate=60.0):
         self.window = window
@@ -201,22 +232,14 @@ class GameScene (object):
         self.camera = imptux.Camera()
         
         self.window.set_exclusive_mouse()
-        #~ self.camera.x, self.camera.y, self.camera.z = (4, -48, 320)
-        #~ self.camera.rx, self.camera.ry = (14.75, -1.5)
-        #~ self.camera.x, self.camera.y, self.camera.z = (-6, -48, 602)
-        #~ self.camera.rx, self.camera.ry = (12.0, -6.25)
-        #~ self.camera.x, self.camera.y, self.camera.z = (-2, -242, 602)
-        #~ self.camera.rx, self.camera.ry = (0.0, -0.25)
-        #~ self.camera.x, self.camera.y, self.camera.z = (0, -64, 300)
-        #~ self.camera.rx, self.camera.ry = (14.75, 0.0)
-        #~ self.camera.x, self.camera.y, self.camera.z = (0, -138, 300)
-        #~ self.camera.rx, self.camera.ry = (4.0, 0.0)
         self.camera.fieldofview = 90
-        #~ self.camera.x, self.camera.y, self.camera.z = (0, -138, 134)
-        #~ self.camera.rx, self.camera.ry = (4.0, 0.0)
         self.camera.x, self.camera.y, self.camera.z = (39.1404673467, -128, 76)
         self.camera.rx, self.camera.ry = (-18.75, -22.0)
 
+        self.score = 0
+        self.current_font = 0
+        self.set_ui_font()
+        
         self.clock = pyglet.clock.ClockDisplay()
         self.new_game()
         
@@ -239,13 +262,23 @@ class GameScene (object):
     def dispatch_enemy (self, dt):
         for n in xrange(4):
             self.collision_entities.append(EnemyDrone(n*-100, -200, -2000 + n*-110))
-            
+    
+    def set_ui_font (self):
+        pyglet.font.add_file('./fonts/'+font_list[self.current_font][0])
+        self.font = pyglet.font.load(font_list[self.current_font][1])
+        self.score_label = pyglet.text.Label("00000000", font_list[self.current_font][1], font_list[self.current_font][2], color=ui_color)
+        
     def update_game (self, dt):
+        self.score += 0.5
+        self.score_label.text = "%08d" % self.score
         self.player.update(dt)
         temp = []
         for entity in self.collision_entities:
             if entity.update(dt):
                 temp.append(entity)
+            else: # TODO: Fix this score hack
+                self.score += 100
+                self.score_label.text = "%08d" % self.score
         self.collision_entities = temp
         temp = []
         for munition in self.munitions:
@@ -282,8 +315,10 @@ class GameScene (object):
         self.player.draw()
         # Draw UI
         gl.glLoadIdentity()
-        gl.glTranslatef(self.width-140,self.height-60,-512)
-        self.clock.draw()
+        gl.glTranslatef(self.width-self.score_label.content_width,self.height-self.score_label.content_height,-512)
+        #~ self.clock.draw()
+        #~ gl.glTranslatef(-400, 0, 0)
+        self.score_label.draw()
         self.window.invalid = False
         
     def on_key_press (self, symbol, modifiers):
@@ -291,6 +326,14 @@ class GameScene (object):
             self.player.move_left(1)
         elif symbol == pyglet.window.key.D:
             self.player.move_right(1)
+        elif symbol == pyglet.window.key.R:
+            self.current_font = (self.current_font - 1) % len(font_list)
+            print 'Font: ' + font_list[self.current_font][1]
+            self.set_ui_font()
+        elif symbol == pyglet.window.key.T:
+            self.current_font = (self.current_font + 1) % len(font_list)
+            print 'Font: ' + font_list[self.current_font][1]
+            self.set_ui_font()
         
     def on_key_release (self, symbol, modifiers):
         if symbol == pyglet.window.key.A:
