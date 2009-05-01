@@ -1,4 +1,4 @@
-import imptux, pyglet, time, math, random, platform
+import imptux, pyglet, time, math, random, platform, os
 from pyglet import gl
 from distutils.version import LooseVersion
 
@@ -259,7 +259,7 @@ class GameScene (object):
         self.score = 0
         self.current_font = 0
         
-        pyglet.font.add_file('./fonts/l25a__.TTF')
+        pyglet.font.add_file(os.path.join('.','fonts', 'l25a__.TTF'))
         self.font = pyglet.font.load('Logic twenty-five A')
         self.score_label = pyglet.text.Label("00000000", 'Logic twenty-five A', 64, color=(200,00,0,255))
         
