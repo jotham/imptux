@@ -4,7 +4,7 @@ import ctypes
 
 
 class Camera (object):
-    fog_color = ctypes.cast((gl.GLfloat*4)(0,0,0.0,0), ctypes.POINTER(gl.GLfloat))
+    #~ fog_color = ctypes.cast((gl.GLfloat*4)(0,0,0.0,0), ctypes.POINTER(gl.GLfloat))
     
     def __init__ (self):
         self.fieldofview = 60

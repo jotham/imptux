@@ -245,7 +245,6 @@ class GameScene (object):
         self.camera = imptux.Camera()
         
         self.window.set_exclusive_mouse()
-        self.camera.fieldofview = 90
         #~ self.camera.x, self.camera.y, self.camera.z = (39.1404673467, -128, 76)
         #~ self.camera.rx, self.camera.ry = (-18.75, -22.0)
         #~ self.camera.x, self.camera.y, self.camera.z = (-64.9041492903, -156, 104)
@@ -255,6 +254,7 @@ class GameScene (object):
         self.camera.x, self.camera.y, self.camera.z = (-4.29767643203, -178, 34)
         self.camera.rx, self.camera.ry = (-13.25, -22.5)
         self.camera.clipfar = 7000
+        self.camera.fieldofview = 90
 
         self.score = 0
         self.current_font = 0
@@ -263,7 +263,7 @@ class GameScene (object):
         self.font = pyglet.font.load('Logic twenty-five A')
         self.score_label = pyglet.text.Label("00000000", 'Logic twenty-five A', 64, color=(200,00,0,255))
         
-        self.clock = pyglet.clock.ClockDisplay()
+        #~ self.clock = pyglet.clock.ClockDisplay()
         self.new_game()
         
     def end (self):
@@ -334,13 +334,10 @@ class GameScene (object):
         self.player.draw()
         # Draw UI
         gl.glLoadIdentity()
-        
         if self.window.fullscreen:
             gl.glTranslatef(self.width-self.score_label.content_width,self.height-self.score_label.content_height,-1100)
         else:
             gl.glTranslatef(self.width-self.score_label.content_width,self.height-self.score_label.content_height,-512)
-        #~ self.clock.draw()
-        #~ gl.glTranslatef(0, 0, -512)
         self.score_label.draw()
         self.window.invalid = False
         
@@ -374,7 +371,6 @@ class GameScene (object):
             self.player_fire()
     
     def on_resize (self, width, height):
-        print 'resize'
         self.width = width
         self.height = height
         self.camera.defaultView(width, height)
