@@ -3,6 +3,7 @@
 import imptux, pyglet, time, math, random, platform, os
 from pyglet import gl
 from distutils.version import LooseVersion
+from imptux import joystick
 
 GPROFILER_ERROR = None
 try:
@@ -88,6 +89,54 @@ class TerrainPillarPair (object):
         self.model.draw(gl.GL_LINES)
         gl.glPopMatrix()
 
+class EnemyDrone (object):
+    model = pyglet.graphics.vertex_list(32,('v3f/static', prepare(0,0,0,0.5,0.5,0.5,ENEMY_VERTEX_LIST)))
+    
+    def __init__ (self, x, y, z):
+        self.x = x
+        self.y = y
+        self.z = z
+        self.rz = 0
+        self.vz = 400
+        self.health = 2
+        self.step = 0
+        self.step_rate = math.pi/4
+        self.c = 0
+        self.update()
+        
+    def update (self, dt=0):
+        if self.health < 0 or self.z > 0:
+            return False
+        self.step += self.step_rate * dt
+        self.x = 200 * math.sin(self.step+self.z/200.0)
+        self.z += self.vz * dt
+        self.left = self.x - 25 # 50
+        self.right = self.x + 25 # 50
+        self.top = self.z + 0
+        self.bottom = self.z - 50 # 100
+        self.c *= .9
+        self.virtual_rz, self.virtual_x, self.virtual_y = get_displacement(self.x)
+        return True
+    
+    def draw (self):
+        #~ gl.glColor3f(1.0, 0, 1.0)
+        #~ pyglet.graphics.vertex_list(8, ('v3f/static', (
+            #~ self.left, self.y, self.bottom, self.left, self.y, self.top, self.left, self.y,
+            #~ self.top, self.right, self.y, self.top, self.right, self.y, self.top, self.right, self.y,
+            #~ self.bottom, self.right, self.y, self.bottom, self.left, self.y, self.bottom))).draw(gl.GL_LINES)
+        gl.glPushMatrix()
+        gl.glTranslatef(self.virtual_x, self.virtual_y, self.z)
+        gl.glRotatef(self.virtual_rz,0,0,1)
+        gl.glColor3f(1.0, self.c, 0)
+        self.model.draw(gl.GL_LINES)
+        gl.glPopMatrix()
+        
+    def collision (self, munition):
+        #~ if munition.x < self.x:
+            #~ self.rz =
+        self.c = 1
+        self.health -= 1
+
 class Player (object):
     #~ model = pyglet.graphics.vertex_list(32,('v3f/static', prepare(0,0,0,0.5,0.5,0.5, PLAYER_VERTEX_LIST)))
     model = pyglet.graphics.vertex_list(164,('v3f/static', PLAYER_SHIP_2))
@@ -139,62 +188,26 @@ class Player (object):
             self.vx = self.iv
         elif self.vx > 0:
             self.decay = 0.8
-        
-    def fire (self, now):
+    
+    def move_free (self, amount):
+        if abs(amount) < 0.2:
+            self.decay = 0.8
+        else:
+            self.decay = 1
+            self.vx = amount * self.iv
+            
+    def fire (self, now, mode=0):
         if True: # now > self.timestamp:
             self.timestamp = now + self.fire_delay
             #~ self.c = 1
-            return (PlayerBulletModel(self.x-12, self.y, self.z+5, 5),PlayerBulletModel(self.x+12, self.y, self.z+5, -5))
+            if mode == 0:
+                return (PlayerBulletModel(self.x-12, self.y, self.z+5, 5),PlayerBulletModel(self.x+12, self.y, self.z+5, -5))
+            else:
+                return (
+                    PlayerBulletModelSpecial(self.x-25, self.y, self.z+15, 5),
+                    PlayerBulletModelSpecial(self.x+25, self.y, self.z+15, -5))
         return None
 
-class EnemyDrone (object):
-    model = pyglet.graphics.vertex_list(32,('v3f/static', prepare(0,0,0,0.5,0.5,0.5,ENEMY_VERTEX_LIST)))
-    
-    def __init__ (self, x, y, z):
-        self.x = x
-        self.y = y
-        self.z = z
-        self.rz = 0
-        self.vz = 400
-        self.health = 2
-        self.step = 0
-        self.step_rate = math.pi/4
-        self.c = 0
-        self.update()
-        
-    def update (self, dt=0):
-        if self.health < 0 or self.z > 0:
-            return False
-        self.step += self.step_rate * dt
-        self.x = 200 * math.sin(self.step+self.z/200.0)
-        self.z += self.vz * dt
-        self.left = self.x - 25 # 50
-        self.right = self.x + 25 # 50
-        self.top = self.z + 0
-        self.bottom = self.z - 50 # 100
-        self.c *= .9
-        self.virtual_rz, self.virtual_x, self.virtual_y = get_displacement(self.x)
-        return True
-    
-    def draw (self):
-        #~ gl.glColor3f(1.0, 0, 1.0)
-        #~ pyglet.graphics.vertex_list(8, ('v3f/static', (
-            #~ self.left, self.y, self.bottom, self.left, self.y, self.top, self.left, self.y,
-            #~ self.top, self.right, self.y, self.top, self.right, self.y, self.top, self.right, self.y,
-            #~ self.bottom, self.right, self.y, self.bottom, self.left, self.y, self.bottom))).draw(gl.GL_LINES)
-        gl.glPushMatrix()
-        gl.glTranslatef(self.virtual_x, self.virtual_y, self.z)
-        gl.glRotatef(self.virtual_rz,0,0,1)
-        gl.glColor3f(1.0, self.c, 0)
-        self.model.draw(gl.GL_LINES)
-        gl.glPopMatrix()
-        
-    def collision (self, munition):
-        #~ if munition.x < self.x:
-            #~ self.rz =
-        self.c = 1
-        self.health -= 1
-        
 class PlayerBulletModel (object):
     model = pyglet.graphics.vertex_list(6, ('v3f/static', prepare(0,0,0,0.5,0.5,0.5,PLAYER_BULLET_VERTEX_LIST)))
     
@@ -239,6 +252,48 @@ class PlayerBulletModel (object):
         self.model.draw(gl.GL_LINES)
         gl.glPopMatrix()
 
+class PlayerBulletModelSpecial (object):
+    model = pyglet.graphics.vertex_list(6, ('v3f/static', prepare(0,0,0,0.5,0.5,5,PLAYER_BULLET_VERTEX_LIST)))
+    
+    def __init__ (self, x, y, z, vx=0, vz=-650):
+        self.x = x
+        self.y = y
+        self.z = z
+        self.rz = 0
+        self.vrz = 500
+        if x < 0:
+            self.vrz *= -1
+        self.vz = vz
+        self.vx = vx
+        self.boundsz = -2000
+        self.active = True
+        self.update()
+        
+    def update (self, dt=0):
+        if not self.active or self.z < self.boundsz or self.x < -200 or self.x > 200:
+            return False
+        self.z += self.vz * dt
+        self.x += self.vx * dt
+        self.left = self.x - 5#10
+        self.right = self.x + 5#10
+        self.top = self.z + 2.5#5
+        self.bottom = self.z - 2.5#5
+        self.rz += self.vrz * dt
+        self.virtual_rz, self.virtual_x, self.virtual_y = get_displacement(self.x)
+        return True
+    
+    def collision (self, entity):
+        self.active = False
+        
+    def draw (self):
+        b = random.random()*0.6
+        gl.glColor3f(b, b, 1.0)
+        gl.glPushMatrix()
+        gl.glTranslatef(self.virtual_x, self.virtual_y, self.z)
+        gl.glRotatef(self.virtual_rz+self.rz,0,0,1)
+        self.model.draw(gl.GL_LINES)
+        gl.glPopMatrix()
+        
 class GameScene (object):
     def __init__ (self, window, framerate=60.0):
         self.window = window
@@ -247,6 +302,10 @@ class GameScene (object):
         self.framerate = framerate
         self.window.push_handlers(self)
         self.camera = imptux.Camera()
+        
+        self.joystick = joystick.JoystickHandler()
+        print "%d joystick(s) found" % self.joystick.joysticks
+        self.joystick.push_handlers(self.on_joystick_button, self.on_joystick_axis)
         
         self.window.set_exclusive_mouse()
         #~ self.camera.x, self.camera.y, self.camera.z = (39.1404673467, -128, 76)
@@ -259,7 +318,8 @@ class GameScene (object):
         self.camera.rx, self.camera.ry = (-13.25, -22.5)
         self.camera.clipfar = 7000
         self.camera.fieldofview = 90
-
+        self.camera_target_z = -100000
+        
         self.score = 0
         self.current_font = 0
         
@@ -293,6 +353,7 @@ class GameScene (object):
     def update_game (self, dt):
         self.score += 0.5
         self.score_label.text = "%08d" % self.score
+        self.joystick.dispatch_events()
         self.player.update(dt)
         self.terrain.update(dt)
         temp = []
@@ -317,15 +378,15 @@ class GameScene (object):
         self.camera.update()
         self.window.invalid = True
         
-    def player_fire (self):
-        munition_objects = self.player.fire(time.time())
+    def player_fire (self, mode=0):
+        munition_objects = self.player.fire(time.time(), mode)
         if munition_objects:
             self.munitions.extend(munition_objects)
                 
     def on_draw (self):
         self.window.clear()
         self.camera.x = self.player.x/1.5
-        self.camera.position((0, 0, -10000))
+        self.camera.position((0, 0, self.camera_target_z))
         rz = self.player.x / 200.0
         gl.glRotatef(-5*rz,0,0,1)
         self.terrain.draw()
@@ -345,6 +406,19 @@ class GameScene (object):
         self.score_label.draw()
         self.window.invalid = False
         
+    def on_joystick_button (self, joystick, button, pressed):
+        if not pressed: return
+        if button == 0:
+            self.player_fire(0)
+        elif button == 1:
+            self.player_fire(1)
+        elif button == 3:
+            self.window.set_fullscreen(not self.window.fullscreen)
+
+    def on_joystick_axis (self, joystick, axis, value):
+        if axis == 0 or axis == 4:
+            self.player.move_free(value)
+            
     def on_key_press (self, symbol, modifiers):
         if symbol == pyglet.window.key.A:
             self.player.move_left(1)
