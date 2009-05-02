@@ -581,11 +581,11 @@ def make_fire_probability (probability, sizes=(1, 4, 0.2)):
         return random.choice(sizes)
     return 0
     
-class LevelOne (EventDispatcher):
+class LevelOne (object):
     label = 'LEVEL: TRAFFIC'
     
     def __init__ (self, dispatch_callback, dispatch_b_callback, dispatch_entity_munitions_callback):
-        super(EventDispatcher, self).__init__()
+        #~ super(EventDispatcher, self).__init__()
         self.dispatch_callback = dispatch_callback
         self.dispatch_b_callback = dispatch_b_callback
         self.dispatch_entity_munitions_callback = dispatch_entity_munitions_callback
@@ -686,6 +686,9 @@ class LevelOne (EventDispatcher):
                 print self.mode
         
 class GameScene (object):
+    game_music = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','imptux-1.ogg')))
+    #~ game_music = pyglet.media.StaticSource(pyglet.media.load('imptux-2.ogg'))
+    
     def __init__ (self, window, framerate=60.0, level_framerate=30.0):
         self.window = window
         self.width = window.width
@@ -697,11 +700,16 @@ class GameScene (object):
         self.toggle_camera_mode(DEBUG)
         #~ self.window.set_fullscreen(not self.window.fullscreen)
         #~ self.window.set_exclusive_mouse()
+
+        self.music_player = pyglet.media.Player()
+        self.music_player.eos_action = pyglet.media.Player.EOS_LOOP
+        self.music_player.queue(self.game_music)
+        self.toggle_game_music(not DEBUG)
+        self.music_player.volume = 0.7
+        
         self.joystick = joystick.JoystickHandler()
         print "%d joystick(s) found. Press F2 to enable." % self.joystick.joysticks
         self.toggle_joystick(True)
-        pyglet.font.add_file(os.path.join('.','imptux', 'l25a__.TTF'))
-        self.font = pyglet.font.load('Logic twenty-five A')
         self.score_label = pyglet.text.Label("00000000", 'Logic twenty-five A', 48, color=(200,00,0,255))
         self.health_label = pyglet.text.Label("000", 'Logic twenty-five A', 48, color=(200,00,0,255))
         self.notification_label = pyglet.text.Label("", 'Logic twenty-five A', 84, color=(200,0,0,255))
@@ -885,6 +893,20 @@ class GameScene (object):
         self.camera.defaultView(self.width, self.height)
         self.window.invalid = True
 
+    def toggle_game_music (self, active=True):
+        self.playing_music = active
+        if self.playing_music:
+            self.music_player.play()
+        else:
+            self.music_player.pause()
+
+    def toggle_help (self, active=True):
+        self.playing_music = active
+        if self.playing_music:
+            self.music_player.play()
+        else:
+            self.music_player.pause()
+    
     def on_draw (self):
         self.window.clear()
         self.camera.x = self.player.x/1.5
@@ -958,6 +980,8 @@ class GameScene (object):
             self.toggle_camera_mode(not self.camera_debug_mode)
         elif symbol == pyglet.window.key.F2:
             self.toggle_joystick(not self.joystick_mode)
+        elif symbol == pyglet.window.key.M:
+            self.toggle_game_music(not self.playing_music)
         
     def on_key_release (self, symbol, modifiers):
         if symbol == pyglet.window.key.A:
@@ -1016,36 +1040,48 @@ class GameScene (object):
         elif button==4:
             self.camera.ry+=dx/4.
             self.camera.rx-=dy/4.
-            
+
 class MenuScene (object):
-    def __init__ (self, window):
+    def __init__ (self, window, navigation_callback):
         self.window = window
         self.width = window.width
         self.height = window.height
         self.window.push_handlers(self)
+        self.navigation_callback = navigation_callback
         #~ self.document = pyglet.text.decode_text('Controls:\n')
-    
+        #~ self.layout = pyglet.text.layout.TextLayout(self.document, window.width, window.height, multiline=True)
+        
+        story_stream = open(os.path.join(os.getcwd(), 'imptux', 'story.png'), 'rb')
+        self.story = pyglet.sprite.Sprite(pyglet.image.load('story.png', story_stream))
+
+        self.title = pyglet.text.Label("TUX IMPERIUM", 'Logic twenty-five A', 48, color=(200,00,0,255))
+
     def end (self):
         self.window.pop_handlers()
-    
+        
+    def on_mouse_release (self, x, y, button, modifiers):
+        self.navigation_callback()
+            
+    def on_key_release (self, symbol, modifiers):
+        if symbol != pyglet.window.key.F and symbol != pyglet.window.key.ESCAPE:
+            self.navigation_callback()
+            
     def on_draw (self):
-        pass
+        self.window.clear()
+        gl.glLoadIdentity() 
+        gl.glTranslatef((self.window.width-self.title.content_width)/2,(self.window.height-self.title.content_height)/2+50, 0)
+        self.title.draw()
+        gl.glTranslatef(-7,-(self.story.height+10), 0)
+        self.story.draw()
     
 class TuxImperium (object):
-    game_music = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','imptux-1.ogg')))
-    #~ game_music = pyglet.media.StaticSource(pyglet.media.load('imptux-2.ogg'))
-    
     def __init__ (self, window):
         self.window = window
         self.window.push_handlers(self.on_key_release)
+        pyglet.font.add_file(os.path.join('.','imptux', 'l25a__.TTF'))
+        self.font = pyglet.font.load('Logic twenty-five A')
         self.current_scene = None
-        self.profiler = None        
-        
-        self.player = pyglet.media.Player()
-        self.player.eos_action = pyglet.media.Player.EOS_LOOP
-        self.player.queue(self.game_music)
-        self.toggle_game_music(not DEBUG)
-        self.player.volume = 0.7
+        self.profiler = None
         
     def on_key_release (self, symbol, modifiers):
         if symbol == pyglet.window.key.ESCAPE:
@@ -1058,15 +1094,6 @@ class TuxImperium (object):
             return pyglet.event.EVENT_HANDLED
         elif symbol == pyglet.window.key.F:
             self.window.set_fullscreen(not self.window.fullscreen)
-        elif symbol == pyglet.window.key.M:
-            self.toggle_game_music(not self.playing_music)
-    
-    def toggle_game_music (self, active=True):
-        self.playing_music = active
-        if self.playing_music:
-            self.player.play()
-        else:
-            self.player.pause()
             
     def show_profiler (self):
         # FYI: Wont work if you don't have PyGTK
@@ -1077,7 +1104,12 @@ class TuxImperium (object):
             self.profiler.destroy()
         self.profiler = profiler.GProfiler()
         self.profiler.show()
-            
+    
+    def scene_menu (self):
+        if self.current_scene:
+            self.current_scene.end()
+        self.current_scene = MenuScene(self.window, self.scene_game)
+        
     def scene_game (self):
         if self.current_scene:
             self.current_scene.end()
@@ -1093,7 +1125,7 @@ def main ():
     else:
         profiler.pyglet()
     game = TuxImperium(pyglet.window.Window(1000, 500))
-    game.scene_game()
+    game.scene_menu()
     pyglet.app.run()
     
 if __name__ == '__main__':
