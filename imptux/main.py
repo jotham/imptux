@@ -72,8 +72,8 @@ PAYLOAD_SHIELD = prepare(0,-100,0,1,1,1,imptux.models.MODEL_PAYLOAD_SHIELD)
 
 DEBUG = False
 
-ENCRYPTER_MUNITION_STRENGTH = 2
-ENCRYPTER_HEALTH = 2
+ENCRYPTER_MUNITION_STRENGTH = 8
+ENCRYPTER_HEALTH = 1
 
 PAYLOAD_MUNITION_STRENGTH = 15
 PAYLOAD_HEALTH = 50
@@ -276,10 +276,10 @@ class Player (object):
     
     def update (self, dt=0, now=0):
         self.x = max(-self.boundsx, min(self.boundsx, self.x + (self.vx * dt) ))
-        self.left = self.x - 32.5
-        self.right = self.x + 32.5
-        self.top = self.z + 25
-        self.bottom = self.z - 25
+        self.left = self.x - 28
+        self.right = self.x + 28
+        self.top = self.z + 23
+        self.bottom = self.z - 23
         self.c *= .8
         self.vx *= self.decay
         self.yoffset = 4*math.sin(self.bounce)
@@ -655,8 +655,10 @@ class LevelOne (object):
             self.dispatch_callback([EncrypterDrone(n*-100, -200, -2400 + n*-110, 600, n/count*-math.pi/2, math.pi/2, 200, now+n*.35, make_fire_probability(0.09, (0.09,1.0,0.1)), self.dispatch_entity_munitions_callback) for n in xrange(int(count))])
             self.dispatch_callback([EncrypterDrone(n*-100, -200, -2465 + n*-110, 600, (n/count*-math.pi/2)+math.pi, math.pi/2, 200, now+n*.35, make_fire_probability(0.09, (0.25,1.0,0.1)), self.dispatch_entity_munitions_callback) for n in xrange(int(count))])
             self.dispatch_entity_munitions_callback([EncryptionMunition(20*(n/6.0 - 0.5), -200, -2000, 70*(n/6.0 - 0.5)) for n in xrange(6)])
+            if random.random() < 0.2:
+                self.dispatch_entity_munitions_callback([PayloadMunition(400*(n/5.0 - 0.5), -200, -2000+random.random()*500, 100*(n/6.0 - 0.5)) for n in xrange(5)])
             self.wave_counter += 1
-            if self.wave_counter > 6:
+            if self.wave_counter > 8:
                 self.mode = 6
                 self.wave_counter = 0
                 print self.mode
@@ -666,7 +668,7 @@ class LevelOne (object):
             self.dispatch_callback([EncrypterDrone(n*-100, -200, -2400 + n*-110, 600, n/count*-math.pi/4.0, math.pi/8.0, 100, now+n*0.2, 0, self.dispatch_entity_munitions_callback) for n in xrange(int(count))])
             count = 3.0
             self.dispatch_callback([EncrypterDrone(n*-100, -200, -2300 + n*-110, 700, n/count*-math.pi/4.0, math.pi/2.0, -190, now+n*0.2, 0.5+(n/count*0.5), self.dispatch_entity_munitions_callback) for n in xrange(int(count))])
-            self.dispatch_entity_munitions_callback([EncryptionMunition(20*(n/6.0 - 0.5), -200, -2500+(n*100), 48+random.randrange(5)) for n in xrange(3)])
+            self.dispatch_entity_munitions_callback([EncryptionMunition(20*(n/6.0 - 0.5), -200, -2500+(n*100), 48+random.randrange(5)) for n in xrange(6)])
             self.wave_counter += 1
             if self.wave_counter > 4:
                 self.mode = 7
@@ -678,7 +680,7 @@ class LevelOne (object):
             self.dispatch_callback([EncrypterDrone(n*-100, -200, -2400 + n*-110, 600, n/count*-math.pi/4.0, math.pi/8.0, -100, now+n*0.2, 0, self.dispatch_entity_munitions_callback) for n in xrange(int(count))])
             count = 3.0
             self.dispatch_callback([EncrypterDrone(n*-100, -200, -2300 + n*-110, 700, n/count*-math.pi/4.0, math.pi/2.0, 190, now+n*0.2, 0.5+(n/count*0.5), self.dispatch_entity_munitions_callback) for n in xrange(int(count))])
-            self.dispatch_entity_munitions_callback([EncryptionMunition(20*(n/6.0 - 0.5), -200, -2500+(n*100), -48-random.randrange(5)) for n in xrange(3)])
+            self.dispatch_entity_munitions_callback([EncryptionMunition(20*(n/6.0 - 0.5), -200, -2500+(n*100), -48-random.randrange(5)) for n in xrange(6)])
             self.wave_counter += 1
             if self.wave_counter > 4:
                 self.mode = 0
@@ -704,7 +706,7 @@ class GameScene (object):
         self.music_player = pyglet.media.Player()
         self.music_player.eos_action = pyglet.media.Player.EOS_LOOP
         self.music_player.queue(self.game_music)
-        #~ self.toggle_game_music(not DEBUG)
+        self.toggle_game_music(not DEBUG)
         self.music_player.volume = 0.7
         
         help_stream = open(os.path.join(os.getcwd(), 'imptux', 'help.png'), 'rb')
@@ -757,7 +759,7 @@ class GameScene (object):
         self.hud_dirty = True
         pyglet.clock.schedule_interval(self.update_game, 1/self.framerate)
         pyglet.clock.schedule_interval(self.current_level.update, 1/self.level_framerate)
-        pyglet.clock.schedule_interval(self.status_check, 15)
+        #~ pyglet.clock.schedule_interval(self.status_check, 15)
         
     def dispatch_entities_callback (self, entities):
         self.collision_entities.extend(entities)
