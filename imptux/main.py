@@ -1,3 +1,5 @@
+#!which `python`
+
 import imptux, pyglet, time, math, random, platform, os
 from pyglet import gl
 from distutils.version import LooseVersion
@@ -142,7 +144,7 @@ class Player (object):
         if True: # now > self.timestamp:
             self.timestamp = now + self.fire_delay
             #~ self.c = 1
-            return (PlayerBulletModel(self.x-12, self.y, self.z+5),PlayerBulletModel(self.x+12, self.y, self.z+5))
+            return (PlayerBulletModel(self.x-12, self.y, self.z+5, 5),PlayerBulletModel(self.x+12, self.y, self.z+5, -5))
         return None
 
 class EnemyDrone (object):
@@ -196,21 +198,23 @@ class EnemyDrone (object):
 class PlayerBulletModel (object):
     model = pyglet.graphics.vertex_list(6, ('v3f/static', prepare(0,0,0,0.5,0.5,0.5,PLAYER_BULLET_VERTEX_LIST)))
     
-    def __init__ (self, x, y, z):
+    def __init__ (self, x, y, z, vx=0, vz=-650):
         self.x = x
         self.y = y
         self.z = z
         self.rz = 0
         self.vrz = 0
-        self.vz = -650
+        self.vz = vz
+        self.vx = vx
         self.boundsz = -2000
         self.active = True
         self.update()
         
     def update (self, dt=0):
-        if not self.active or self.z < self.boundsz:
+        if not self.active or self.z < self.boundsz or self.x < -200 or self.x > 200:
             return False
         self.z += self.vz * dt
+        self.x += self.vx * dt
         self.left = self.x - 5#10
         self.right = self.x + 5#10
         self.top = self.z + 2.5#5

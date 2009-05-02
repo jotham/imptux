@@ -241,6 +241,7 @@ class Window (pyglet.window.Window):
        
 def main ():
     window = Window(900, 555)
+    window.set_fullscreen(True)
     pyglet.app.run()
     
 if __name__ == '__main__':
