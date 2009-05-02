@@ -1,15 +1,15 @@
 IMPERIUM: Tux
 ===============================================================================
 
-Entry in PyWeek #8  <http://www.pyweek.org/8/>
-Team: imptux
+Entry in PyWeek #8 <http://www.pyweek.org/8/>
+Team:    imptux
 Members: jotham <jotham.read@gmail.com>
 
 
 DEPENDENCIES:
 ===============================================================================
 
-  Python 2.5+:     http://www.python.org/
+  Python 2.5+:       http://www.python.org/
   Pyglet 1.1.2+:     http://www.pyglet.org/
 
 For joystick support you will probably need libsdl somewhere on your system.
@@ -29,7 +29,6 @@ Othewise open a terminal / console and "cd" to the game directory and run:
 HOW TO PLAY THE GAME:
 ===============================================================================
 
-Controls:
 A D - Move left. Move right.
 J K - Fire type A. Fire type B. Different enemies require different munitions.
 F   - Fullscreen toggle.
