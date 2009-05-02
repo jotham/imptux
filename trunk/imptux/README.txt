@@ -29,15 +29,21 @@ Othewise open a terminal / console and "cd" to the game directory and run:
 HOW TO PLAY THE GAME:
 ===============================================================================
 
-A D - Move left. Move right.
-J K - Fire type A. Fire type B. Different enemies require different munitions.
-F   - Fullscreen toggle.
-M   - Music toggle.
-H   - In-game key reference.
-ESC - Terminate program.
+Controls
+
+  A D - Move left. Move right.
+  J K - Fire type A. Fire type B. Different enemies require different
+              munitions.
+  F   - Fullscreen toggle.
+  M   - Music toggle.
+  H   - In-game key reference.
+  ESC - Terminate program.
 
 Limited joystick support is also avaliable (and recommended) if you have
 libsdl installed.  This is usually installed with pygame.
+
+Right now there is only one 'level' (set of patterns).  But if people are
+interested I'll probably work on it more.
 
 
 ===============================================================================
