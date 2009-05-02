@@ -238,7 +238,8 @@ else:
     except ImportError:
         pass
     else:
-        sdls = ["SDL", "SDL-1.2", os.path.join(os.getcwd(), 'SDL.dll')] # , os.path.join(os.getcwd(), 'imptux', 'SDL.dll')
+        # TODO: De-lame this
+        sdls = ["SDL", "SDL-1.2", os.path.join(os.getcwd(),'imptux', 'SDL.dll')]
         for sdl in sdls:
             path = ctypes.util.find_library(sdl)
             #~ print path
