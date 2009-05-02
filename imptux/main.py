@@ -309,7 +309,7 @@ class Player (object):
             SND_PEW.play()
             return (PlayerBulletModel(self.x-12, self.y, self.z+5, 5),PlayerBulletModel(self.x+12, self.y, self.z+5, -5))
         elif mode == 1 and now > self.timestamp_b:
-            self.timestamp_b = now + 0.25 + (self.weapon_b_cooldown/100.0)
+            self.timestamp_b = now + 0.15 + (self.weapon_b_cooldown/100.0)
             SND_PEW3.play()
             return (
                 PlayerBulletModelSpecial(self.x-25, self.y, self.z+15, 5),
@@ -318,12 +318,12 @@ class Player (object):
     
     def collision_entity (self, entity):
         SND_SHIELD.play()
-        self.health -= 5
+        self.health -= 15
         self.c = 1
         
     def collision_entity_munition (self, entity_munition):
         SND_SHIELD.play()
-        self.health -= 1
+        self.health -= entity_munition.strength
         self.c = 1.5
 
 class EncrypterDrone (object):
@@ -397,6 +397,7 @@ class EncryptionMunition (object):
         self.vrz = -500
         self.vz = vz
         self.vx = vx
+        self.strength = 2
         self.boundsz = 0
         self.active = True
         self.update()
@@ -440,6 +441,7 @@ class PayloadMunition (object):
         self.vrz = -500
         self.vz = vz
         self.vx = vx
+        self.strength = 15
         self.boundsz = 0
         self.active = True
         SND_DHHHD.play()
