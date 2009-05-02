@@ -595,7 +595,7 @@ class LevelOne (EventDispatcher):
                 self.dispatch_callback([EncrypterDrone(n*-100, -200, -2465 + n*-50, 600,(n/count*-math.pi/2)+math.pi, math.pi/4, 200, now+n*.35, make_fire_probability(0.2), self.dispatch_entity_munitions_callback) for n in xrange(int(count))])
                 self.wave_counter += 1
                 if self.wave_counter > 6:
-                    #~ self.mode = 1
+                    self.mode = 1
                     self.wave_counter = 0
                     print self.mode
             elif self.mode == 1:
@@ -694,6 +694,8 @@ class GameScene (object):
         self.level_label = pyglet.text.Label("", 'Logic twenty-five A', 64, color=(200,00,0,255))
         self.level_label_timestamp = None
         
+        self.hud_dirty = False
+        
         self.fire_a = False
         self.fire_b = False
         
@@ -766,6 +768,9 @@ class GameScene (object):
                     player.collision_entity(entity)
                 else:
                     temp.append(entity)
+            else:
+                self.score += 100
+                self.hud_dirty = True
         self.collision_entities = temp
         
         # UPDATE: Special entities
@@ -773,6 +778,9 @@ class GameScene (object):
         for entity in self.collision_entities_b:
             if entity.update(dt, now):
                 temp.append(entity)
+            else:
+                self.score += 1000
+                self.hud_dirty = True
         self.collision_entities_b = temp
                 
         # UPDATE & COLLISION TEST: Entity munitions vs Player
@@ -872,8 +880,6 @@ class GameScene (object):
         # Draw UI
         gl.glLoadIdentity() 
         
-        
-        
         #~ if self.level_label_timestamp:
             #~ gl.glPushMatrix()
             #~ left = (self.width-self.level_label.content_width)/2
@@ -897,7 +903,9 @@ class GameScene (object):
         #~ self.label.draw()
         #~ gl.glPopMatrix()
         
-        
+        if self.hud_dirty:
+            self.score_label.text = "%08d" % self.score
+                
         if self.window.fullscreen:
             gl.glTranslatef(self.width-self.score_label.content_width,self.height-self.score_label.content_height,-1100)
         else:
