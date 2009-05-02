@@ -28,6 +28,32 @@ def prepare (xo,yo,zo,xs,ys,zs,v):
     for n in xrange(len(v)/3):
         return_list.extend([xo+v[n*3]*xs,yo+v[n*3+1]*ys,zo+v[n*3+2]*zs])
     return return_list
+  
+def make_debris (count):
+    spreadx = 50
+    spreadz = 25
+    offsetz = 35
+    length = 25
+    return_list = []
+    for n in xrange(count):
+        lines = []
+        for line in xrange(5):
+            x = spreadx*(random.random()-0.5)
+            y = 0
+            z = offsetz+spreadz*(random.random()-0.5)
+            len = random.randrange(length)+2
+            lines.extend([x,y,z,x,y,z+len])
+        return_list.append(pyglet.graphics.vertex_list(10,('v3f/static', lines)))
+    return return_list
+
+SND_PEW = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','pew 1.ogg')))
+SND_SHIELD = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','shield.ogg')))
+SND_GRIND1 = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','grind 1.ogg')))
+SND_GRIND2 = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','grind 2.ogg')))
+SND_ZUB1 = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','zub 1.ogg')))
+SND_PEW3 = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','pew 3.ogg')))
+SND_DHHHD = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','dhhhd.ogg')))
+SND_ENTRANCE = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','entrance.ogg')))
 
 PLAYER_VERTEX_LIST = (-50.0, 10.000002, 0.0, 50.0, 10.000002, 0.0, 50.0, 10.000002, 0.0, 50.0, -9.999998, 0.0, 50.0, -9.999998, 0.0, -50.0, -9.999998, 0.0, -50.0, -9.999998, 0.0, -50.0, 10.000002, 0.0, 50.0, -9.999998, 0.0, 50.0, 10.000002, 0.0, 50.0, 10.000002, 0.0, 0.0, -2e-06, -100.0, 0.0, -2e-06, -100.0, 50.0, -9.999998, 0.0, 50.0, 10.000002, 0.0, -50.0, 10.000002, 0.0, -50.0, 10.000002, 0.0, 0.0, -2e-06, -100.0, 0.0, -2e-06, -100.0, 50.0, 10.000002, 0.0, -50.0, 10.000002, 0.0, -50.0, -9.999998, 0.0, -50.0, -9.999998, 0.0, 0.0, -2e-06, -100.0, 0.0, -2e-06, -100.0, -50.0, 10.000002, 0.0, -50.0, -9.999998, 0.0, 50.0, -9.999998, 0.0, 50.0, -9.999998, 0.0, 0.0, -2e-06, -100.0, 0.0, -2e-06, -100.0, -50.0, -9.999998, 0.0)
 TERRAIN_VERTEX_LIST = (-400, 30, -2000, -330, 30, -2000, -330, 30, -2000, -330, 30, 0, -330, 30, 0, -400, 30, 0, -400, 30, 0, -400, 30, -2000, -330, 30, -2000, -324.956177, 29.579521, -2000, -324.956177, 29.579521, -2000, -324.956177, 29.579521, 0, -324.956177, 29.579521, 0, -330, 30, 0, -330, 30, 0, -330, 30, -2000, -324.956177, 29.579521, -2000, -319.409271, 28.364159, -2000, -319.409271, 28.364159, -2000, -319.409271, 28.364159, 0, -319.409271, 28.364159, 0, -324.956177, 29.579521, 0, -324.956177, 29.579521, 0, -324.956177, 29.579521, -2000, -319.409271, 28.364159, -2000, -310.095367, 25.20192, -2000, -310.095367, 25.20192, -2000, -310.095367, 25.20192, 0, -310.095367, 25.20192, 0, -319.409271, 28.364159, 0, -319.409271, 28.364159, 0, -319.409271, 28.364159, -2000, -310.095367, 25.20192, -2000, -283.322876, 12.78336, -2000, -283.322876, 12.78336, -2000, -283.322876, 12.78336, 0, -283.322876, 12.78336, 0, -310.095367, 25.20192, 0, -310.095367, 25.20192, 0, -310.095367, 25.20192, -2000, -283.322876, 12.78336, -2000, -205.223038, -23.061121, -2000, -205.223038, -23.061121, -2000, -205.223038, -23.061121, 0, -205.223038, -23.061121, 0, -283.322876, 12.78336, 0, -283.322876, 12.78336, 0, -283.322876, 12.78336, -2000, -205.223038, -23.061121, -2000, -160.174072, -38.25024, -2000, -160.174072, -38.25024, -2000, -160.174072, -38.25024, 0, -160.174072, -38.25024, 0, -205.223038, -23.061121, 0, -205.223038, -23.061121, 0, -205.223038, -23.061121, -2000, -160.174072, -38.25024, -2000, -107.280006, -50.640003, -2000, -107.280006, -50.640003, -2000, -107.280006, -50.640003, 0, -107.280006, -50.640003, 0, -160.174072, -38.25024, 0, -160.174072, -38.25024, 0, -160.174072, -38.25024, -2000, -107.280006, -50.640003, -2000, -56.760002, -57.48, -2000, -56.760002, -57.48, -2000, -56.760002, -57.48, 0, -56.760002, -57.48, 0, -107.280006, -50.640003, 0, -107.280006, -50.640003, 0, -107.280006, -50.640003, -2000, -56.760002, -57.48, -2000, 0, -60, -2000, 0, -60, -2000, 0, -60, 0, 0, -60, 0, -56.760002, -57.48, 0, -56.760002, -57.48, 0, -56.760002, -57.48, -2000, 0, -60, -2000, 56.400002, -57.48, -2000, 56.400002, -57.48, -2000, 56.400002, -57.48, 0, 56.400002, -57.48, 0, 0, -60, 0, 0, -60, 0, 0, -60, -2000, 56.400002, -57.48, -2000, 106.000008, -50.640003, -2000, 106.000008, -50.640003, -2000, 106.000008, -50.640003, 0, 106.000008, -50.640003, 0, 56.400002, -57.48, 0, 56.400002, -57.48, 0, 56.400002, -57.48, -2000, 106.000008, -50.640003, -2000, 149.400009, -40.559998, -2000, 149.400009, -40.559998, -2000, 149.400009, -40.559998, 0, 149.400009, -40.559998, 0, 106.000008, -50.640003, 0, 106.000008, -50.640003, 0, 106.000008, -50.640003, -2000, 149.400009, -40.559998, -2000, 194.140793, -25.70784, -2000, 194.140793, -25.70784, -2000, 194.140793, -25.70784, 0, 194.140793, -25.70784, 0, 149.400009, -40.559998, 0, 149.400009, -40.559998, 0, 149.400009, -40.559998, -2000, 194.140793, -25.70784, -2000, 248.400009, -1.68, -2000, 248.400009, -1.68, -2000, 248.400009, -1.68, 0, 248.400009, -1.68, 0, 194.140793, -25.70784, 0, 194.140793, -25.70784, 0, 194.140793, -25.70784, -2000, 248.400009, -1.68, -2000, 302.198395, 23.825281, -2000, 302.198395, 23.825281, -2000, 302.198395, 23.825281, 0, 302.198395, 23.825281, 0, 248.400009, -1.68, 0, 248.400009, -1.68, 0, 248.400009, -1.68, -2000, 302.198395, 23.825281, -2000, 313.200012, 27.48, -2000, 313.200012, 27.48, -2000, 313.200012, 27.48, 0, 313.200012, 27.48, 0, 302.198395, 23.825281, 0, 302.198395, 23.825281, 0, 302.198395, 23.825281, -2000, 313.200012, 27.48, -2000, 320.126404, 29.066881, -2000, 320.126404, 29.066881, -2000, 320.126404, 29.066881, 0, 320.126404, 29.066881, 0, 313.200012, 27.48, 0, 313.200012, 27.48, 0, 313.200012, 27.48, -2000, 320.126404, 29.066881, -2000, 323.481598, 29.579521, -2000, 323.481598, 29.579521, -2000, 323.481598, 29.579521, 0, 323.481598, 29.579521, 0, 320.126404, 29.066881, 0, 320.126404, 29.066881, 0, 320.126404, 29.066881, -2000, 323.481598, 29.579521, -2000, 330, 30, -2000, 330, 30, -2000, 330, 30, 0, 330, 30, 0, 323.481598, 29.579521, 0, 323.481598, 29.579521, 0, 323.481598, 29.579521, -2000, 330, 30, -2000, 400, 30, -2000, 400, 30, -2000, 400, 30, 0, 400, 30, 0, 330, 30, 0, 330, 30, 0, 330, 30, -2000)
@@ -45,6 +71,14 @@ PAYLOAD_MUNITION = prepare(0,0,0,0.5,0.5,0.5,imptux.models.MODEL_PAYLOAD_MUNITIO
 PAYLOAD_SHIELD = prepare(0,-100,0,1,1,1,imptux.models.MODEL_PAYLOAD_SHIELD)
 
 DEBUG = False
+
+ENCRYPTER_MUNITION_STRENGTH = 2
+ENCRYPTER_HEALTH = 2
+
+PAYLOAD_MUNITION_STRENGTH = 15
+PAYLOAD_HEALTH = 50
+
+PLAYER_HEALTH = 100
 
 class Terrain (object):
     model = pyglet.graphics.vertex_list(168,('v3f/static', prepare(0,0,0,1,1,4,TERRAIN_VERTEX_LIST)))
@@ -179,33 +213,7 @@ class PlayerBulletModelSpecial (object):
         gl.glRotatef(self.virtual_rz+self.rz,0,0,1)
         self.model.draw(gl.GL_LINES)
         gl.glPopMatrix()
-        
-def make_debris (count):
-    spreadx = 50
-    spreadz = 25
-    offsetz = 35
-    length = 25
-    return_list = []
-    for n in xrange(count):
-        lines = []
-        for line in xrange(5):
-            x = spreadx*(random.random()-0.5)
-            y = 0
-            z = offsetz+spreadz*(random.random()-0.5)
-            len = random.randrange(length)+2
-            lines.extend([x,y,z,x,y,z+len])
-        return_list.append(pyglet.graphics.vertex_list(10,('v3f/static', lines)))
-    return return_list
-
-SND_PEW = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','pew 1.ogg')))
-SND_SHIELD = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','shield.ogg')))
-SND_GRIND1 = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','grind 1.ogg')))
-SND_GRIND2 = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','grind 2.ogg')))
-SND_ZUB1 = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','zub 1.ogg')))
-SND_PEW3 = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','pew 3.ogg')))
-SND_DHHHD = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','dhhhd.ogg')))
-SND_ENTRANCE = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','entrance.ogg')))
-
+      
 class Player (object):
     #~ model = pyglet.graphics.vertex_list(32,('v3f/static', prepare(0,0,0,0.5,0.5,0.5, PLAYER_VERTEX_LIST)))
     model = pyglet.graphics.vertex_list(164,('v3f/static', PLAYER_SHIP_2))
@@ -228,9 +236,9 @@ class Player (object):
         self.heal_timestamp = 0
         self.weapon_a_cooldown = 0
         self.weapon_b_cooldown = 0
-        self.heal_rate = 0.5
-        self.health = 50
-        self.maximum_health = 50
+        self.heal_rate = 0.33
+        self.health = PLAYER_HEALTH
+        self.maximum_health = PLAYER_HEALTH
         self.c = 0
         self.boundsx = 200
         self.bounce_rate = 9
@@ -335,7 +343,7 @@ class EncrypterDrone (object):
         self.y = y
         self.z = z
         self.vz = vz
-        self.health = 1
+        self.health = ENCRYPTER_HEALTH
         self.phase = phase_offset
         self.phase_rate = phase_rate
         self.phase_amplitude = phase_amplitude
@@ -397,7 +405,7 @@ class EncryptionMunition (object):
         self.vrz = -500
         self.vz = vz
         self.vx = vx
-        self.strength = 2
+        self.strength = ENCRYPTER_MUNITION_STRENGTH
         self.boundsz = 0
         self.active = True
         self.update()
@@ -441,7 +449,7 @@ class PayloadMunition (object):
         self.vrz = -500
         self.vz = vz
         self.vx = vx
-        self.strength = 15
+        self.strength = PAYLOAD_MUNITION_STRENGTH
         self.boundsz = 0
         self.active = True
         SND_DHHHD.play()
@@ -485,7 +493,7 @@ class PayloadDrone (object):
         self.z = z
         self.vz = 4070
         self.yoffset = 0
-        self.health = 50
+        self.health = PAYLOAD_HEALTH
         self.bounce_rate = 4
         self.bounce = 0
         #~ self.step = 0
@@ -676,7 +684,7 @@ class LevelOne (EventDispatcher):
                 self.mode = 0
                 self.wave_counter = 0
                 print self.mode
-
+        
 class GameScene (object):
     def __init__ (self, window, framerate=60.0, level_framerate=30.0):
         self.window = window
@@ -687,7 +695,7 @@ class GameScene (object):
         self.window.push_handlers(self)
         self.camera = imptux.Camera()
         self.toggle_camera_mode(DEBUG)
-        self.window.set_fullscreen(not self.window.fullscreen)
+        #~ self.window.set_fullscreen(not self.window.fullscreen)
         #~ self.window.set_exclusive_mouse()
         self.joystick = joystick.JoystickHandler()
         print "%d joystick(s) found. Press F2 to enable." % self.joystick.joysticks
@@ -1009,7 +1017,20 @@ class GameScene (object):
             self.camera.ry+=dx/4.
             self.camera.rx-=dy/4.
             
-
+class MenuScene (object):
+    def __init__ (self, window):
+        self.window = window
+        self.width = window.width
+        self.height = window.height
+        self.window.push_handlers(self)
+        #~ self.document = pyglet.text.decode_text('Controls:\n')
+    
+    def end (self):
+        self.window.pop_handlers()
+    
+    def on_draw (self):
+        pass
+    
 class TuxImperium (object):
     game_music = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','imptux-1.ogg')))
     #~ game_music = pyglet.media.StaticSource(pyglet.media.load('imptux-2.ogg'))
