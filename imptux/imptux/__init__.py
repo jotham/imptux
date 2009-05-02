@@ -34,7 +34,7 @@ class Camera (object):
         #~ gl.glFogf(gl.GL_FOG_END, 7300.0)
         #~ gl.glEnable(gl.GL_FOG)
         
-    def update (self):
+    def update (self, dt=0):
         pass
         
     def position (self, target=None):
