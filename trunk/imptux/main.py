@@ -42,6 +42,7 @@ PAYLOAD_SHIP = prepare(0,-100,0,1,-1,1,imptux.models.MODEL_PAYLOAD)
 PAYLOAD_SHIP_2 = prepare(0,-100,0,1,-1,1,imptux.models.MODEL_PAYLOAD_2)
 #~ ENCRYPTER_SHIP_2 = prepare(0,0,0,0.25,.5,0.25,imptux.models.MODEL_ENCRYPTER_2)
 PAYLOAD_MUNITION = prepare(0,0,0,0.5,0.5,0.5,imptux.models.MODEL_PAYLOAD_MUNITION)
+PAYLOAD_SHIELD = prepare(0,-100,0,1,1,1,imptux.models.MODEL_PAYLOAD_SHIELD)
 
 class Terrain (object):
     model = pyglet.graphics.vertex_list(168,('v3f/static', prepare(0,0,0,1,1,4,TERRAIN_VERTEX_LIST)))
@@ -193,12 +194,23 @@ def make_debris (count):
             lines.extend([x,y,z,x,y,z+len])
         return_list.append(pyglet.graphics.vertex_list(10,('v3f/static', lines)))
     return return_list
-    
+
+SND_PEW = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','pew 1.ogg')))
+SND_SHIELD = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','shield.ogg')))
+SND_GRIND1 = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','grind 1.ogg')))
+SND_GRIND2 = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','grind 2.ogg')))
+SND_ZUB1 = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','zub 1.ogg')))
+SND_PEW3 = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','pew 3.ogg')))
+SND_DHHHD = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','dhhhd.ogg')))
+SND_ENTRANCE = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','entrance.ogg')))
+
 class Player (object):
     #~ model = pyglet.graphics.vertex_list(32,('v3f/static', prepare(0,0,0,0.5,0.5,0.5, PLAYER_VERTEX_LIST)))
     model = pyglet.graphics.vertex_list(164,('v3f/static', PLAYER_SHIP_2))
     shield = pyglet.graphics.vertex_list(120,('v3f/static', PLAYER_SHIELD))
     debris = make_debris(5)
+    
+    sound_player = pyglet.media.Player()
     
     def __init__ (self, x, y, z):
         self.x = x
@@ -209,12 +221,14 @@ class Player (object):
         self.decay = 1
         self.iv = 450
         self.fire_delay = .125
-        self.timestamp = 0
+        self.timestamp_a = 0
+        self.timestamp_b = 0
         self.c = 0
         self.boundsx = 200
         self.bounce_rate = 9
         self.bounce = 0
         self.health = 10
+        self.new_grind = True
         self.update()
         
     def draw (self):
@@ -226,6 +240,15 @@ class Player (object):
             # random lines
             gl.glColor3f(1.0, 1.0, 0)
             random.choice(self.debris).draw(gl.GL_LINES)
+            if self.new_grind:
+                self.new_grind = False
+                SND_GRIND2.play()
+                #~ self.sound_player.queue(SND_GRIND2)
+                #~ self.sound_player.next()
+                #~ self.sound_player.play()
+                # queue sound
+        else:
+            self.new_grind = True
         
         if self.c > 0.5:
             c2 = self.c/2.0
@@ -270,22 +293,31 @@ class Player (object):
             self.vx = amount * self.iv
             
     def fire (self, now, mode=0):
-        if True: # now > self.timestamp:
-            self.timestamp = now + self.fire_delay
+        if mode == 0 and now > self.timestamp_a:
+            self.timestamp_a = now + 0.1
+            SND_PEW.play()
+            return (PlayerBulletModel(self.x-12, self.y, self.z+5, 5),PlayerBulletModel(self.x+12, self.y, self.z+5, -5))
+        elif mode == 1 and now > self.timestamp_b:
+            self.timestamp_b = now + 0.25
+            SND_PEW3.play()
+            return (
+                PlayerBulletModelSpecial(self.x-25, self.y, self.z+15, 5),
+                PlayerBulletModelSpecial(self.x+25, self.y, self.z+15, -5))
+                
+        #~ if mode
+        #~ if True: # now > self.timestamp:
+            #~ self.timestamp = now + self.fire_delay
             #~ self.c = 1
-            if mode == 0:
-                return (PlayerBulletModel(self.x-12, self.y, self.z+5, 5),PlayerBulletModel(self.x+12, self.y, self.z+5, -5))
-            else:
-                return (
-                    PlayerBulletModelSpecial(self.x-25, self.y, self.z+15, 5),
-                    PlayerBulletModelSpecial(self.x+25, self.y, self.z+15, -5))
+
         return None
     
     def collision_entity (self, entity):
+        SND_SHIELD.play()
         self.health -= 1
         self.c = 1
         
     def collision_entity_munition (self, entity_munition):
+        SND_SHIELD.play()
         self.health -= 1
         self.c = 1.5
 
@@ -357,6 +389,7 @@ class PayloadMunition (object):
         self.vx = vx
         self.boundsz = -2000
         self.active = True
+        SND_DHHHD.play()
         self.update()
         
     def update (self, dt=0, now=0):
@@ -389,6 +422,7 @@ class PayloadMunition (object):
 class PayloadDrone (object):
     #~ model = pyglet.graphics.vertex_list(360,('v3f/static', PAYLOAD_SHIP))
     model = pyglet.graphics.vertex_list(496,('v3f/static', PAYLOAD_SHIP_2))
+    shield = pyglet.graphics.vertex_list(120,('v3f/static', PAYLOAD_SHIELD))
     
     def __init__ (self, x, y, z, phase, appear_delay, fire_cycle, dispatch_callback):
         self.x = x
@@ -409,6 +443,7 @@ class PayloadDrone (object):
         self.fire_delay = 0.5
         self.dispatch_callback = dispatch_callback
         self.c = 0
+        SND_ENTRANCE.play()
         self.update()
         
     def update (self, dt=0, now=0):
@@ -424,10 +459,14 @@ class PayloadDrone (object):
         if self.fire_timestamp < now:
             self.fire_timestamp = now + self.fire_delay
             xoff = (self.step/4.0) * 100 - 50
+            #~ SND_ZUB1.volume = 0.2
+            #~ SND_ZUB1.play()
             self.dispatch_callback([PayloadMunition(self.x+xoff, self.y, self.z+150, xoff)])
             self.step += 1
             if self.step > 4:
                 self.step = 0
+                if self.fire_delay > 0.2:
+                    self.fire_delay *= 0.9
             
         self.yoffset = 4*math.sin(self.bounce)
         self.bounce += self.bounce_rate * dt
@@ -456,11 +495,18 @@ class PayloadDrone (object):
         gl.glPushMatrix()
         gl.glTranslatef(self.virtual_x, self.virtual_y+self.yoffset, self.z+self.yoffset*5)
         gl.glRotatef(self.virtual_rz,0,0,1)
+                    
+        if self.c > 0.5:
+            c2 = self.c/2.0
+            gl.glColor3f(c2*.5,c2*0.1, c2*0.1)
+            self.shield.draw(gl.GL_LINES)
+            
         gl.glColor3f(0.8+0.2*self.c, 0.1, 0.9*self.c)
         self.model.draw(gl.GL_LINES)
         gl.glPopMatrix()
         
     def collision (self, munition):
+        if self.z < -1800: return
         self.c = 1
         self.health -= 1
         
@@ -477,7 +523,8 @@ class LevelOne (EventDispatcher):
         self.dispatch_entity_munitions_callback = dispatch_entity_munitions_callback
         self.drone_timestamp = time.time() 
         self.drone_period = 2
-        self.mode = 1
+        self.wave_counter = 0
+        self.mode = 0
         self.payload = None
     
     def update (self, dt):
@@ -487,19 +534,47 @@ class LevelOne (EventDispatcher):
         if self.drone_timestamp < now:
             self.drone_timestamp = now + self.drone_period
             if self.mode == 0:
-                count = 4.0
+                self.mode = 1
+            elif self.mode == 1:
+                self.mode = 2
+            elif self.mode == 2:
+                count = 6.0
                 #~ self, x, y, z, phase, appear_delay, fire_cycle, dispatch_callback
                 self.dispatch_callback([EncrypterDrone(n*-100, -200, -2400 + n*-110, n/count*-math.pi/2, now+n*.35, 1, self.dispatch_entity_munitions_callback) for n in xrange(int(count))])
                 self.dispatch_callback([EncrypterDrone(n*-100, -200, -2465 + n*-110, (n/count*-math.pi/2)+math.pi, now+n*.35, 1, self.dispatch_entity_munitions_callback) for n in xrange(int(count))])
-                if not self.payload:
-                    self.mode = 1
-            elif self.mode == 1:
+                self.wave_counter += 1
+                if self.wave_counter > 18:
+                    self.mode = 3
+                    self.wave_counter = 0
+                    print self.mode
+            elif self.mode == 3:
                 count = 4.0
                 self.dispatch_callback([EncrypterDrone(n*-100, -200, -2400 + n*-110, n/count*-math.pi/2, now+n*.35, 1, self.dispatch_entity_munitions_callback) for n in xrange(int(count))])
                 self.dispatch_callback([EncrypterDrone(n*-100, -200, -2465 + n*-110, (n/count*-math.pi/2)+math.pi, now+n*.35, 1, self.dispatch_entity_munitions_callback) for n in xrange(int(count))])
                 self.payload = PayloadDrone(0, -200, -8000, 0, 0, 1, self.dispatch_entity_munitions_callback)
+                self.wave_counter += 1
                 self.dispatch_b_callback([self.payload])
-                self.mode = 0
+                self.mode = 4
+            elif self.mode == 4:
+                count = 5.0
+                self.dispatch_callback([EncrypterDrone(n*-100, -200, -2400 + n*-110, n/count*-math.pi/2, now+n*.35, 1, self.dispatch_entity_munitions_callback) for n in xrange(int(count))])
+                self.dispatch_callback([EncrypterDrone(n*-100, -200, -2465 + n*-110, (n/count*-math.pi/2)+math.pi, now+n*.35, 1, self.dispatch_entity_munitions_callback) for n in xrange(int(count))])
+                self.wave_counter += 1
+                if not self.payload and self.wave_counter > 18:
+                    self.mode = 5
+                    self.wave_counter = 0
+                    print self.mode
+            elif self.mode == 5:
+                count = 4.0
+                self.dispatch_callback([EncrypterDrone(n*-100, -200, -2400 + n*-110, n/count*-math.pi/2, now+n*.35, 1, self.dispatch_entity_munitions_callback) for n in xrange(int(count))])
+                self.dispatch_callback([EncrypterDrone(n*-100, -200, -2465 + n*-110, (n/count*-math.pi/2)+math.pi, now+n*.35, 1, self.dispatch_entity_munitions_callback) for n in xrange(int(count))])
+                self.wave_counter += 1
+                if self.wave_counter > 6:
+                    self.mode = 0
+                    self.wave_counter = 0
+                    print self.mode
+                
+
 
 class GameScene (object):
     def __init__ (self, window, framerate=60.0, level_framerate=30.0):
@@ -515,7 +590,7 @@ class GameScene (object):
         
         self.window.set_exclusive_mouse()
         self.joystick = joystick.JoystickHandler()
-        print "%d joystick(s) found. Press J to enable." % self.joystick.joysticks
+        print "%d joystick(s) found. Press F2 to enable." % self.joystick.joysticks
         self.toggle_joystick(True)
         pyglet.font.add_file(os.path.join('.','imptux', 'l25a__.TTF'))
         self.font = pyglet.font.load('Logic twenty-five A')
@@ -523,6 +598,10 @@ class GameScene (object):
         self.current_level = None
         self.level_label = pyglet.text.Label("", 'Logic twenty-five A', 64, color=(200,00,0,255))
         self.level_label_timestamp = None
+        
+        self.fire_a = False
+        self.fire_b = False
+        
         self.new_game()
         
     def end (self):
@@ -559,13 +638,23 @@ class GameScene (object):
         self.munitions_c.extend(entities)
         
     def update_game (self, dt):
+        now = time.time()
+        
         self.joystick.dispatch_events()
         self.player.update(dt)
         self.terrain.update(dt)
         #~ self.camera.update(dt)
-        now = time.time()
         player = self.player
         
+        if self.fire_a:
+            munitions = self.player.fire(now, 0)
+            if munitions:
+                self.munitions_a.extend(munitions)
+        if self.fire_b:
+            munitions = self.player.fire(now, 1)
+            if munitions:
+                self.munitions_b.extend(munitions)
+            
         # TODO: Reorganise this to minimise unnessasary loops
         
         # UPDATE & COLLISION TEST: Entity vs Player
@@ -631,14 +720,6 @@ class GameScene (object):
 
         self.window.invalid = True
         
-    def player_fire (self, mode=0):
-        munition_objects = self.player.fire(time.time(), mode)
-        if munition_objects:
-            if mode == 0:
-                self.munitions_a.extend(munition_objects)
-            else:
-                self.munitions_b.extend(munition_objects)
-            
     def toggle_joystick (self, active=False):
         self.joystick_mode = active
         if self.joystick_mode:
@@ -723,47 +804,63 @@ class GameScene (object):
             gl.glTranslatef(self.width-self.score_label.content_width,self.height-self.score_label.content_height,-512)
         self.score_label.draw()
         self.window.invalid = False
-        
-    def on_joystick_button (self, joystick, button, pressed):
-        if not pressed: return
-        if button == 0:
-            self.player_fire(0)
-        elif button == 1:
-            self.player_fire(1)
-        elif button == 3:
-            self.window.set_fullscreen(not self.window.fullscreen)
-
-    def on_joystick_axis (self, joystick, axis, value):
-        if axis == 0 or axis == 4:
-            self.player.move_free(value)
             
     def on_key_press (self, symbol, modifiers):
         if symbol == pyglet.window.key.A:
             self.player.move_left(1)
         elif symbol == pyglet.window.key.D:
             self.player.move_right(1)
-        elif symbol == pyglet.window.key.SPACE:
-            self.player_fire()
         elif symbol == pyglet.window.key.J:
-            self.toggle_joystick(not self.camera_debug_mode)
+            self.fire_a = True
+        elif symbol == pyglet.window.key.K:
+            self.fire_b = True
         elif symbol == pyglet.window.key.C:
             print 'self.camera.x, self.camera.y, self.camera.z = (%s, %s, %s)' % (self.camera.x, self.camera.y, self.camera.z)
             print 'self.camera.rx, self.camera.ry = (%s, %s)' % (self.camera.rx, self.camera.ry)
         elif symbol == pyglet.window.key.F1:
             self.toggle_camera_mode(not self.camera_debug_mode)
+        elif symbol == pyglet.window.key.F2:
+            self.toggle_joystick(not self.joystick_mode)
         
     def on_key_release (self, symbol, modifiers):
         if symbol == pyglet.window.key.A:
             self.player.move_left(0)
         elif symbol == pyglet.window.key.D:
             self.player.move_right(0)
+        elif symbol == pyglet.window.key.J:
+            self.fire_a = False
+        elif symbol == pyglet.window.key.K:
+            self.fire_b = False
         
     def on_mouse_press (self, x, y, button, modifiers):
         if button == pyglet.window.mouse.LEFT:
-            self.player_fire(0)
+            self.fire_a = True
+            #~ self.player_fire(0)
         if button == pyglet.window.mouse.RIGHT:
-            self.player_fire(1)
+            self.fire_b = True
+            #~ self.player_fire(1)
             
+    def on_mouse_release (self, x, y, button, modifiers):
+        if button == pyglet.window.mouse.LEFT:
+            self.fire_a = False
+        if button == pyglet.window.mouse.RIGHT:
+            self.fire_b = False
+                    
+    def on_joystick_button (self, joystick, button, pressed):
+        #~ if not pressed: return
+        if button == 0:
+            self.fire_a = pressed
+            #~ self.player_fire(0)
+        elif button == 1:
+            self.fire_b = pressed
+            #~ self.player_fire(1)
+        elif button == 3:
+            self.window.set_fullscreen(not self.window.fullscreen)
+
+    def on_joystick_axis (self, joystick, axis, value):
+        if axis == 0 or axis == 4:
+            self.player.move_free(value)
+        
     def on_resize (self, width, height):
         self.width = width
         self.height = height
@@ -797,8 +894,8 @@ class TuxImperium (object):
         self.player = pyglet.media.Player()
         self.player.eos_action = pyglet.media.Player.EOS_LOOP
         self.player.queue(self.game_music)
-        self.toggle_game_music(False)
-        self.player.volume = 0.8
+        self.toggle_game_music(True)
+        self.player.volume = 0.7
         
     def on_key_release (self, symbol, modifiers):
         if symbol == pyglet.window.key.ESCAPE:
