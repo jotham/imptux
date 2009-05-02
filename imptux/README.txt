@@ -6,6 +6,8 @@ Team:    imptux
 Members: jotham <jotham.read@gmail.com>
 
 
+Special thanks to my friend Dylan who made the soundtrack!
+
 DEPENDENCIES:
 ===============================================================================
 
