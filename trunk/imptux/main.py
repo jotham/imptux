@@ -304,8 +304,8 @@ class GameScene (object):
         self.camera = imptux.Camera()
         
         self.joystick = joystick.JoystickHandler()
-        print "%d joystick(s) found" % self.joystick.joysticks
-        self.joystick.push_handlers(self.on_joystick_button, self.on_joystick_axis)
+        self.joystick_mode = False
+        print "%d joystick(s) found. Press J to enable." % self.joystick.joysticks
         
         self.window.set_exclusive_mouse()
         #~ self.camera.x, self.camera.y, self.camera.z = (39.1404673467, -128, 76)
@@ -432,6 +432,13 @@ class GameScene (object):
             self.current_font = (self.current_font + 1) % len(font_list)
             print 'Font: ' + font_list[self.current_font][1]
             self.set_ui_font()
+        elif symbol == pyglet.window.key.J:
+            self.joystick_mode = not self.joystick_mode
+            if self.joystick_mode:
+                self.joystick.push_handlers(self.on_joystick_button, self.on_joystick_axis)
+            else:
+                self.joystick.pop_handlers()
+            print "Joystick %s" % ('disabled', 'enabled')[int(self.joystick_mode)]
         
     def on_key_release (self, symbol, modifiers):
         if symbol == pyglet.window.key.A:
