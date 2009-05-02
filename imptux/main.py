@@ -704,8 +704,12 @@ class GameScene (object):
         self.music_player = pyglet.media.Player()
         self.music_player.eos_action = pyglet.media.Player.EOS_LOOP
         self.music_player.queue(self.game_music)
-        self.toggle_game_music(not DEBUG)
+        #~ self.toggle_game_music(not DEBUG)
         self.music_player.volume = 0.7
+        
+        help_stream = open(os.path.join(os.getcwd(), 'imptux', 'help.png'), 'rb')
+        self.help_sprite = pyglet.sprite.Sprite(pyglet.image.load('help.png', help_stream))
+        self.help_mode = False
         
         self.joystick = joystick.JoystickHandler()
         print "%d joystick(s) found. Press F2 to enable." % self.joystick.joysticks
@@ -940,6 +944,7 @@ class GameScene (object):
         self.score_label.text = "%08d" % self.score
         # %03d%% %03d%% ... self.player.weapon_a_cooldown, self.player.weapon_b_cooldown, 
         
+            
         if self.window.fullscreen:
             gl.glTranslatef(-self.width,self.height-self.score_label.content_height,-1090)
             self.health_label.draw()
@@ -962,6 +967,13 @@ class GameScene (object):
                 gl.glColor4f(0,0,0,128)
                 gl.glRectf(0, 0, self.notification_label.content_width+6, self.notification_label.content_height+6)
                 self.notification_label.draw()
+                
+        # Draw help
+        if self.help_mode:
+            gl.glLoadIdentity() 
+            gl.glTranslatef(self.help_sprite.width/-2,(self.help_sprite.height)/-2,-250)
+            self.help_sprite.draw()
+            
         self.window.invalid = False
             
     def on_key_press (self, symbol, modifiers):
@@ -982,6 +994,8 @@ class GameScene (object):
             self.toggle_joystick(not self.joystick_mode)
         elif symbol == pyglet.window.key.M:
             self.toggle_game_music(not self.playing_music)
+        elif symbol == pyglet.window.key.H:
+            self.help_mode = not self.help_mode
         
     def on_key_release (self, symbol, modifiers):
         if symbol == pyglet.window.key.A:
@@ -1069,7 +1083,7 @@ class MenuScene (object):
     def on_draw (self):
         self.window.clear()
         gl.glLoadIdentity() 
-        gl.glTranslatef((self.window.width-self.title.content_width)/2,(self.window.height-self.title.content_height)/2+50, 0)
+        gl.glTranslatef((self.window.width-self.title.content_width)/2,(self.window.height-self.title.content_height)/2+60, 0)
         self.title.draw()
         gl.glTranslatef(-7,-(self.story.height+10), 0)
         self.story.draw()
