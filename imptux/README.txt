@@ -11,8 +11,12 @@ Special thanks to my friend Dylan who made the soundtrack!
 DEPENDENCIES:
 ===============================================================================
 
-  Python 2.5+:       http://www.python.org/
+  Python 2.5+ (Not python 3.x!):       http://www.python.org/
   Pyglet 1.1.2+:     http://www.pyglet.org/
+  
+And if you are on Linux, you might need:
+
+  AVBin              http://code.google.com/p/avbin/
 
 For joystick support you will probably need libsdl somewhere on your system.
 I have bundled the windows DLL with this game.
@@ -35,7 +39,7 @@ Controls
 
   A D - Move left. Move right.
   J K - Fire type A. Fire type B. Different enemies require different
-              munitions.
+        munitions.
   F   - Fullscreen toggle.
   M   - Music toggle.
   H   - In-game key reference.
