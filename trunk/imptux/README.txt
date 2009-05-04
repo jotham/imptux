@@ -11,8 +11,8 @@ Special thanks to my friend Dylan who made the soundtrack!
 DEPENDENCIES:
 ===============================================================================
 
-  Python 2.5+ (Not python 3.x!):       http://www.python.org/
-  Pyglet 1.1.2+:     http://www.pyglet.org/
+  Python 2.5+ (Not python 3.x!): http://www.python.org/
+  Pyglet 1.1.2+:                 http://www.pyglet.org/
   
 And if you are on Linux, you might need:
 

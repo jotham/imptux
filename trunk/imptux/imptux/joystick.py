@@ -239,7 +239,7 @@ else:
         pass
     else:
         # TODO: De-lame this
-        sdls = ["SDL", "SDL-1.2", os.path.join(os.getcwd(),'imptux', 'SDL.dll')]
+        sdls = ["SDL", "SDL-1.2", os.path.join(os.getcwd(),'assets', 'SDL.dll')]
         for sdl in sdls:
             path = ctypes.util.find_library(sdl)
             #~ print path
