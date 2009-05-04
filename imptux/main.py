@@ -6,11 +6,17 @@ from pyglet.event import EventDispatcher
 from distutils.version import LooseVersion
 from imptux import joystick
 
-GPROFILER_ERROR = None
-try:
-    from imptux import profiler
-except ImportError, e:
-    GPROFILER_ERROR = e
+import ctypes
+#~ try:
+    #~ ctypes.util.find_library(os.path.join(os.getcwd(),'imptux', 'avbin.dll'))
+#~ except Exception, e:
+    #~ print e
+
+#~ GPROFILER_ERROR = None
+#~ try:
+    #~ from imptux import profiler
+#~ except ImportError, e:
+    #~ GPROFILER_ERROR = e
 
 # generate displacement map for terrain cage
 displacement_resolution = 1024
@@ -46,14 +52,15 @@ def make_debris (count):
         return_list.append(pyglet.graphics.vertex_list(10,('v3f/static', lines)))
     return return_list
 
-SND_PEW = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','pew 1.ogg')))
-SND_SHIELD = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','shield.ogg')))
-SND_GRIND1 = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','grind 1.ogg')))
-SND_GRIND2 = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','grind 2.ogg')))
-SND_ZUB1 = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','zub 1.ogg')))
-SND_PEW3 = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','pew 3.ogg')))
-SND_DHHHD = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','dhhhd.ogg')))
-SND_ENTRANCE = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','entrance.ogg')))
+SND_PEW = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'assets','pew 1.ogg')))
+SND_SHIELD = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'assets','shield.ogg')))
+SND_GRIND1 = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'assets','grind 1.ogg')))
+SND_GRIND2 = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'assets','grind 2.ogg')))
+SND_ZUB1 = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'assets','zub 1.ogg')))
+SND_PEW3 = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'assets','pew 3.ogg')))
+SND_DHHHD = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'assets','dhhhd.ogg')))
+SND_ENTRANCE = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'assets','entrance.ogg')))
+SND_GAME_MUSIC = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'assets','imptux-1.ogg')))
 
 PLAYER_VERTEX_LIST = (-50.0, 10.000002, 0.0, 50.0, 10.000002, 0.0, 50.0, 10.000002, 0.0, 50.0, -9.999998, 0.0, 50.0, -9.999998, 0.0, -50.0, -9.999998, 0.0, -50.0, -9.999998, 0.0, -50.0, 10.000002, 0.0, 50.0, -9.999998, 0.0, 50.0, 10.000002, 0.0, 50.0, 10.000002, 0.0, 0.0, -2e-06, -100.0, 0.0, -2e-06, -100.0, 50.0, -9.999998, 0.0, 50.0, 10.000002, 0.0, -50.0, 10.000002, 0.0, -50.0, 10.000002, 0.0, 0.0, -2e-06, -100.0, 0.0, -2e-06, -100.0, 50.0, 10.000002, 0.0, -50.0, 10.000002, 0.0, -50.0, -9.999998, 0.0, -50.0, -9.999998, 0.0, 0.0, -2e-06, -100.0, 0.0, -2e-06, -100.0, -50.0, 10.000002, 0.0, -50.0, -9.999998, 0.0, 50.0, -9.999998, 0.0, 50.0, -9.999998, 0.0, 0.0, -2e-06, -100.0, 0.0, -2e-06, -100.0, -50.0, -9.999998, 0.0)
 TERRAIN_VERTEX_LIST = (-400, 30, -2000, -330, 30, -2000, -330, 30, -2000, -330, 30, 0, -330, 30, 0, -400, 30, 0, -400, 30, 0, -400, 30, -2000, -330, 30, -2000, -324.956177, 29.579521, -2000, -324.956177, 29.579521, -2000, -324.956177, 29.579521, 0, -324.956177, 29.579521, 0, -330, 30, 0, -330, 30, 0, -330, 30, -2000, -324.956177, 29.579521, -2000, -319.409271, 28.364159, -2000, -319.409271, 28.364159, -2000, -319.409271, 28.364159, 0, -319.409271, 28.364159, 0, -324.956177, 29.579521, 0, -324.956177, 29.579521, 0, -324.956177, 29.579521, -2000, -319.409271, 28.364159, -2000, -310.095367, 25.20192, -2000, -310.095367, 25.20192, -2000, -310.095367, 25.20192, 0, -310.095367, 25.20192, 0, -319.409271, 28.364159, 0, -319.409271, 28.364159, 0, -319.409271, 28.364159, -2000, -310.095367, 25.20192, -2000, -283.322876, 12.78336, -2000, -283.322876, 12.78336, -2000, -283.322876, 12.78336, 0, -283.322876, 12.78336, 0, -310.095367, 25.20192, 0, -310.095367, 25.20192, 0, -310.095367, 25.20192, -2000, -283.322876, 12.78336, -2000, -205.223038, -23.061121, -2000, -205.223038, -23.061121, -2000, -205.223038, -23.061121, 0, -205.223038, -23.061121, 0, -283.322876, 12.78336, 0, -283.322876, 12.78336, 0, -283.322876, 12.78336, -2000, -205.223038, -23.061121, -2000, -160.174072, -38.25024, -2000, -160.174072, -38.25024, -2000, -160.174072, -38.25024, 0, -160.174072, -38.25024, 0, -205.223038, -23.061121, 0, -205.223038, -23.061121, 0, -205.223038, -23.061121, -2000, -160.174072, -38.25024, -2000, -107.280006, -50.640003, -2000, -107.280006, -50.640003, -2000, -107.280006, -50.640003, 0, -107.280006, -50.640003, 0, -160.174072, -38.25024, 0, -160.174072, -38.25024, 0, -160.174072, -38.25024, -2000, -107.280006, -50.640003, -2000, -56.760002, -57.48, -2000, -56.760002, -57.48, -2000, -56.760002, -57.48, 0, -56.760002, -57.48, 0, -107.280006, -50.640003, 0, -107.280006, -50.640003, 0, -107.280006, -50.640003, -2000, -56.760002, -57.48, -2000, 0, -60, -2000, 0, -60, -2000, 0, -60, 0, 0, -60, 0, -56.760002, -57.48, 0, -56.760002, -57.48, 0, -56.760002, -57.48, -2000, 0, -60, -2000, 56.400002, -57.48, -2000, 56.400002, -57.48, -2000, 56.400002, -57.48, 0, 56.400002, -57.48, 0, 0, -60, 0, 0, -60, 0, 0, -60, -2000, 56.400002, -57.48, -2000, 106.000008, -50.640003, -2000, 106.000008, -50.640003, -2000, 106.000008, -50.640003, 0, 106.000008, -50.640003, 0, 56.400002, -57.48, 0, 56.400002, -57.48, 0, 56.400002, -57.48, -2000, 106.000008, -50.640003, -2000, 149.400009, -40.559998, -2000, 149.400009, -40.559998, -2000, 149.400009, -40.559998, 0, 149.400009, -40.559998, 0, 106.000008, -50.640003, 0, 106.000008, -50.640003, 0, 106.000008, -50.640003, -2000, 149.400009, -40.559998, -2000, 194.140793, -25.70784, -2000, 194.140793, -25.70784, -2000, 194.140793, -25.70784, 0, 194.140793, -25.70784, 0, 149.400009, -40.559998, 0, 149.400009, -40.559998, 0, 149.400009, -40.559998, -2000, 194.140793, -25.70784, -2000, 248.400009, -1.68, -2000, 248.400009, -1.68, -2000, 248.400009, -1.68, 0, 248.400009, -1.68, 0, 194.140793, -25.70784, 0, 194.140793, -25.70784, 0, 194.140793, -25.70784, -2000, 248.400009, -1.68, -2000, 302.198395, 23.825281, -2000, 302.198395, 23.825281, -2000, 302.198395, 23.825281, 0, 302.198395, 23.825281, 0, 248.400009, -1.68, 0, 248.400009, -1.68, 0, 248.400009, -1.68, -2000, 302.198395, 23.825281, -2000, 313.200012, 27.48, -2000, 313.200012, 27.48, -2000, 313.200012, 27.48, 0, 313.200012, 27.48, 0, 302.198395, 23.825281, 0, 302.198395, 23.825281, 0, 302.198395, 23.825281, -2000, 313.200012, 27.48, -2000, 320.126404, 29.066881, -2000, 320.126404, 29.066881, -2000, 320.126404, 29.066881, 0, 320.126404, 29.066881, 0, 313.200012, 27.48, 0, 313.200012, 27.48, 0, 313.200012, 27.48, -2000, 320.126404, 29.066881, -2000, 323.481598, 29.579521, -2000, 323.481598, 29.579521, -2000, 323.481598, 29.579521, 0, 323.481598, 29.579521, 0, 320.126404, 29.066881, 0, 320.126404, 29.066881, 0, 320.126404, 29.066881, -2000, 323.481598, 29.579521, -2000, 330, 30, -2000, 330, 30, -2000, 330, 30, 0, 330, 30, 0, 323.481598, 29.579521, 0, 323.481598, 29.579521, 0, 323.481598, 29.579521, -2000, 330, 30, -2000, 400, 30, -2000, 400, 30, -2000, 400, 30, 0, 400, 30, 0, 330, 30, 0, 330, 30, 0, 330, 30, -2000)
@@ -688,10 +695,11 @@ class LevelOne (object):
                 print self.mode
         
 class GameScene (object):
-    game_music = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'imptux','imptux-1.ogg')))
-    #~ game_music = pyglet.media.StaticSource(pyglet.media.load('imptux-2.ogg'))
+    game_music = SND_GAME_MUSIC
     
     def __init__ (self, window, framerate=60.0, level_framerate=30.0):
+        self.player = None
+        
         self.window = window
         self.width = window.width
         self.height = window.height
@@ -709,7 +717,7 @@ class GameScene (object):
         self.toggle_game_music(not DEBUG)
         self.music_player.volume = 0.7
         
-        help_stream = open(os.path.join(os.getcwd(), 'imptux', 'help.png'), 'rb')
+        help_stream = open(os.path.join(os.getcwd(), 'assets', 'help.png'), 'rb')
         self.help_sprite = pyglet.sprite.Sprite(pyglet.image.load('help.png', help_stream))
         self.help_mode = False
         
@@ -915,6 +923,7 @@ class GameScene (object):
     
     def on_draw (self):
         self.window.clear()
+        if not self.player: return
         self.camera.x = self.player.x/1.5
         if self.camera_debug_mode:
             self.camera.position()
@@ -1067,7 +1076,7 @@ class MenuScene (object):
         #~ self.document = pyglet.text.decode_text('Controls:\n')
         #~ self.layout = pyglet.text.layout.TextLayout(self.document, window.width, window.height, multiline=True)
         
-        story_stream = open(os.path.join(os.getcwd(), 'imptux', 'story.png'), 'rb')
+        story_stream = open(os.path.join(os.getcwd(), 'assets', 'story.png'), 'rb')
         self.story = pyglet.sprite.Sprite(pyglet.image.load('story.png', story_stream))
 
         self.title = pyglet.text.Label("TUX IMPERIUM", 'Logic twenty-five A', 48, color=(200,00,0,255))
@@ -1094,7 +1103,7 @@ class TuxImperium (object):
     def __init__ (self, window):
         self.window = window
         self.window.push_handlers(self.on_key_release)
-        pyglet.font.add_file(os.path.join('.','imptux', 'l25a__.TTF'))
+        pyglet.font.add_file(os.path.join('.','assets', 'l25a__.TTF'))
         self.font = pyglet.font.load('Logic twenty-five A')
         self.current_scene = None
         self.profiler = None
@@ -1112,14 +1121,15 @@ class TuxImperium (object):
             self.window.set_fullscreen(not self.window.fullscreen)
             
     def show_profiler (self):
+        pass
         # FYI: Wont work if you don't have PyGTK
-        if GPROFILER_ERROR:
-            print 'Failed to initialize profiler (%s)' % GPROFILER_ERROR
-            return
-        if self.profiler:
-            self.profiler.destroy()
-        self.profiler = profiler.GProfiler()
-        self.profiler.show()
+        #~ if GPROFILER_ERROR:
+            #~ print 'Failed to initialize profiler (%s)' % GPROFILER_ERROR
+            #~ return
+        #~ if self.profiler:
+            #~ self.profiler.destroy()
+        #~ self.profiler = profiler.GProfiler()
+        #~ self.profiler.show()
     
     def scene_menu (self):
         if self.current_scene:
@@ -1131,15 +1141,16 @@ class TuxImperium (object):
             self.current_scene.end()
         self.current_scene = GameScene(self.window)
 
+
 def main ():
     if LooseVersion(platform.python_version()) < LooseVersion('2.4'):
         print 'Warning: python version %s is unsupported.' % platform.python_version()
     if LooseVersion(pyglet.version) < LooseVersion('1.1.2') :
         print 'Warning: pyglet version %s is unsupported.' % pyglet.version
-    if GPROFILER_ERROR:
-        print 'Failed to initialize profiler (%s)' % GPROFILER_ERROR
-    else:
-        profiler.pyglet()
+    #~ if GPROFILER_ERROR:
+        #~ print 'Failed to initialize profiler (%s)' % GPROFILER_ERROR
+    #~ else:
+        #~ profiler.pyglet()
     game = TuxImperium(pyglet.window.Window(1000, 500))
     game.scene_menu()
     pyglet.app.run()
