@@ -1,12 +1,7 @@
-
-IMPTUX
-======
-
-![alt tag](https://raw.githubusercontent.com/jotham/imptux/master/progress_screens/MAY032009.png)
-
-
 IMPERIUM: Tux
 ===============================================================================
+
+![alt tag](https://raw.githubusercontent.com/jotham/imptux/master/progress_screens/MAY032009.png)
 
 Entry in PyWeek #8 <http://www.pyweek.org/8/>
 Team:    imptux
