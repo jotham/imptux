@@ -1,12 +1,17 @@
 #!which `python`
 
 import imptux, pyglet, time, math, random, platform, os
+import imptux.models
 from pyglet import gl
 from pyglet.event import EventDispatcher
-from distutils.version import LooseVersion
-from imptux import joystick
+# from distutils.version import LooseVersion
+# from imptux import joystick
 
 import ctypes
+
+def xrange(x):
+    return range(x)
+    
 #~ try:
     #~ ctypes.util.find_library(os.path.join(os.getcwd(),'imptux', 'avbin.dll'))
 #~ except Exception, e:
@@ -31,7 +36,7 @@ def get_displacement (n):
 
 def prepare (xo,yo,zo,xs,ys,zs,v):
     return_list = []
-    for n in xrange(len(v)/3):
+    for n in xrange(int(len(v)/3)):
         return_list.extend([xo+v[n*3]*xs,yo+v[n*3+1]*ys,zo+v[n*3+2]*zs])
     return return_list
   
@@ -52,15 +57,15 @@ def make_debris (count):
         return_list.append(pyglet.graphics.vertex_list(10,('v3f/static', lines)))
     return return_list
 
-SND_PEW = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'assets','pew 1.ogg')))
-SND_SHIELD = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'assets','shield.ogg')))
-SND_GRIND1 = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'assets','grind 1.ogg')))
-SND_GRIND2 = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'assets','grind 2.ogg')))
-SND_ZUB1 = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'assets','zub 1.ogg')))
-SND_PEW3 = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'assets','pew 3.ogg')))
-SND_DHHHD = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'assets','dhhhd.ogg')))
-SND_ENTRANCE = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'assets','entrance.ogg')))
-SND_GAME_MUSIC = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'assets','imptux-1.ogg')))
+# SND_PEW = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'assets','pew 1.ogg')))
+# SND_SHIELD = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'assets','shield.ogg')))
+# SND_GRIND1 = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'assets','grind 1.ogg')))
+# SND_GRIND2 = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'assets','grind 2.ogg')))
+# SND_ZUB1 = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'assets','zub 1.ogg')))
+# SND_PEW3 = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'assets','pew 3.ogg')))
+# SND_DHHHD = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'assets','dhhhd.ogg')))
+# SND_ENTRANCE = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'assets','entrance.ogg')))
+# SND_GAME_MUSIC = pyglet.media.StaticSource(pyglet.media.load(os.path.join(os.getcwd(), 'assets','imptux-1.ogg')))
 
 PLAYER_VERTEX_LIST = (-50.0, 10.000002, 0.0, 50.0, 10.000002, 0.0, 50.0, 10.000002, 0.0, 50.0, -9.999998, 0.0, 50.0, -9.999998, 0.0, -50.0, -9.999998, 0.0, -50.0, -9.999998, 0.0, -50.0, 10.000002, 0.0, 50.0, -9.999998, 0.0, 50.0, 10.000002, 0.0, 50.0, 10.000002, 0.0, 0.0, -2e-06, -100.0, 0.0, -2e-06, -100.0, 50.0, -9.999998, 0.0, 50.0, 10.000002, 0.0, -50.0, 10.000002, 0.0, -50.0, 10.000002, 0.0, 0.0, -2e-06, -100.0, 0.0, -2e-06, -100.0, 50.0, 10.000002, 0.0, -50.0, 10.000002, 0.0, -50.0, -9.999998, 0.0, -50.0, -9.999998, 0.0, 0.0, -2e-06, -100.0, 0.0, -2e-06, -100.0, -50.0, 10.000002, 0.0, -50.0, -9.999998, 0.0, 50.0, -9.999998, 0.0, 50.0, -9.999998, 0.0, 0.0, -2e-06, -100.0, 0.0, -2e-06, -100.0, -50.0, -9.999998, 0.0)
 TERRAIN_VERTEX_LIST = (-400, 30, -2000, -330, 30, -2000, -330, 30, -2000, -330, 30, 0, -330, 30, 0, -400, 30, 0, -400, 30, 0, -400, 30, -2000, -330, 30, -2000, -324.956177, 29.579521, -2000, -324.956177, 29.579521, -2000, -324.956177, 29.579521, 0, -324.956177, 29.579521, 0, -330, 30, 0, -330, 30, 0, -330, 30, -2000, -324.956177, 29.579521, -2000, -319.409271, 28.364159, -2000, -319.409271, 28.364159, -2000, -319.409271, 28.364159, 0, -319.409271, 28.364159, 0, -324.956177, 29.579521, 0, -324.956177, 29.579521, 0, -324.956177, 29.579521, -2000, -319.409271, 28.364159, -2000, -310.095367, 25.20192, -2000, -310.095367, 25.20192, -2000, -310.095367, 25.20192, 0, -310.095367, 25.20192, 0, -319.409271, 28.364159, 0, -319.409271, 28.364159, 0, -319.409271, 28.364159, -2000, -310.095367, 25.20192, -2000, -283.322876, 12.78336, -2000, -283.322876, 12.78336, -2000, -283.322876, 12.78336, 0, -283.322876, 12.78336, 0, -310.095367, 25.20192, 0, -310.095367, 25.20192, 0, -310.095367, 25.20192, -2000, -283.322876, 12.78336, -2000, -205.223038, -23.061121, -2000, -205.223038, -23.061121, -2000, -205.223038, -23.061121, 0, -205.223038, -23.061121, 0, -283.322876, 12.78336, 0, -283.322876, 12.78336, 0, -283.322876, 12.78336, -2000, -205.223038, -23.061121, -2000, -160.174072, -38.25024, -2000, -160.174072, -38.25024, -2000, -160.174072, -38.25024, 0, -160.174072, -38.25024, 0, -205.223038, -23.061121, 0, -205.223038, -23.061121, 0, -205.223038, -23.061121, -2000, -160.174072, -38.25024, -2000, -107.280006, -50.640003, -2000, -107.280006, -50.640003, -2000, -107.280006, -50.640003, 0, -107.280006, -50.640003, 0, -160.174072, -38.25024, 0, -160.174072, -38.25024, 0, -160.174072, -38.25024, -2000, -107.280006, -50.640003, -2000, -56.760002, -57.48, -2000, -56.760002, -57.48, -2000, -56.760002, -57.48, 0, -56.760002, -57.48, 0, -107.280006, -50.640003, 0, -107.280006, -50.640003, 0, -107.280006, -50.640003, -2000, -56.760002, -57.48, -2000, 0, -60, -2000, 0, -60, -2000, 0, -60, 0, 0, -60, 0, -56.760002, -57.48, 0, -56.760002, -57.48, 0, -56.760002, -57.48, -2000, 0, -60, -2000, 56.400002, -57.48, -2000, 56.400002, -57.48, -2000, 56.400002, -57.48, 0, 56.400002, -57.48, 0, 0, -60, 0, 0, -60, 0, 0, -60, -2000, 56.400002, -57.48, -2000, 106.000008, -50.640003, -2000, 106.000008, -50.640003, -2000, 106.000008, -50.640003, 0, 106.000008, -50.640003, 0, 56.400002, -57.48, 0, 56.400002, -57.48, 0, 56.400002, -57.48, -2000, 106.000008, -50.640003, -2000, 149.400009, -40.559998, -2000, 149.400009, -40.559998, -2000, 149.400009, -40.559998, 0, 149.400009, -40.559998, 0, 106.000008, -50.640003, 0, 106.000008, -50.640003, 0, 106.000008, -50.640003, -2000, 149.400009, -40.559998, -2000, 194.140793, -25.70784, -2000, 194.140793, -25.70784, -2000, 194.140793, -25.70784, 0, 194.140793, -25.70784, 0, 149.400009, -40.559998, 0, 149.400009, -40.559998, 0, 149.400009, -40.559998, -2000, 194.140793, -25.70784, -2000, 248.400009, -1.68, -2000, 248.400009, -1.68, -2000, 248.400009, -1.68, 0, 248.400009, -1.68, 0, 194.140793, -25.70784, 0, 194.140793, -25.70784, 0, 194.140793, -25.70784, -2000, 248.400009, -1.68, -2000, 302.198395, 23.825281, -2000, 302.198395, 23.825281, -2000, 302.198395, 23.825281, 0, 302.198395, 23.825281, 0, 248.400009, -1.68, 0, 248.400009, -1.68, 0, 248.400009, -1.68, -2000, 302.198395, 23.825281, -2000, 313.200012, 27.48, -2000, 313.200012, 27.48, -2000, 313.200012, 27.48, 0, 313.200012, 27.48, 0, 302.198395, 23.825281, 0, 302.198395, 23.825281, 0, 302.198395, 23.825281, -2000, 313.200012, 27.48, -2000, 320.126404, 29.066881, -2000, 320.126404, 29.066881, -2000, 320.126404, 29.066881, 0, 320.126404, 29.066881, 0, 313.200012, 27.48, 0, 313.200012, 27.48, 0, 313.200012, 27.48, -2000, 320.126404, 29.066881, -2000, 323.481598, 29.579521, -2000, 323.481598, 29.579521, -2000, 323.481598, 29.579521, 0, 323.481598, 29.579521, 0, 320.126404, 29.066881, 0, 320.126404, 29.066881, 0, 320.126404, 29.066881, -2000, 323.481598, 29.579521, -2000, 330, 30, -2000, 330, 30, -2000, 330, 30, 0, 330, 30, 0, 323.481598, 29.579521, 0, 323.481598, 29.579521, 0, 323.481598, 29.579521, -2000, 330, 30, -2000, 400, 30, -2000, 400, 30, -2000, 400, 30, 0, 400, 30, 0, 330, 30, 0, 330, 30, 0, 330, 30, -2000)
@@ -227,7 +232,7 @@ class Player (object):
     shield = pyglet.graphics.vertex_list(120,('v3f/static', PLAYER_SHIELD))
     debris = make_debris(5)
     
-    sound_player = pyglet.media.Player()
+    # sound_player = pyglet.media.Player()
     
     def __init__ (self, x, y, z):
         self.x = x
@@ -265,7 +270,7 @@ class Player (object):
             random.choice(self.debris).draw(gl.GL_LINES)
             if self.new_grind:
                 self.new_grind = False
-                SND_GRIND2.play()
+                # SND_GRIND2.play()
                 #~ self.sound_player.queue(SND_GRIND2)
                 #~ self.sound_player.next()
                 #~ self.sound_player.play()
@@ -321,11 +326,11 @@ class Player (object):
     def fire (self, now, mode=0):
         if mode == 0 and now > self.timestamp_a:
             self.timestamp_a = now + 0.1 + (self.weapon_a_cooldown/100.0)
-            SND_PEW.play()
+            # SND_PEW.play()
             return (PlayerBulletModel(self.x-12, self.y, self.z+5, 5),PlayerBulletModel(self.x+12, self.y, self.z+5, -5))
         elif mode == 1 and now > self.timestamp_b:
             self.timestamp_b = now + 0.15 + (self.weapon_b_cooldown/100.0)
-            SND_PEW3.play()
+            # SND_PEW3.play()
             return (
                 PlayerBulletModelSpecial(self.x-25, self.y, self.z+15, 5),
                 PlayerBulletModelSpecial(self.x+25, self.y, self.z+15, -5))
@@ -618,7 +623,7 @@ class LevelOne (object):
             if self.wave_counter > 6:
                 self.mode = 1
                 self.wave_counter = 0
-                print self.mode
+                print(self.mode)
         elif self.mode == 1:
             count = 3.0 
             self.dispatch_callback([EncrypterDrone(n*-100, -200, -2400 + n*-60, 600, n/count*-math.pi/2, math.pi/2, 200, 1+now+n*.35, 1.5*(n+1)/count, self.dispatch_entity_munitions_callback) for n in xrange(int(count))])
@@ -630,7 +635,7 @@ class LevelOne (object):
             if self.wave_counter > 6:
                 self.mode = 2
                 self.wave_counter = 0
-                print self.mode
+                print(self.mode)
         elif self.mode == 2:
             count = 6.0
             self.dispatch_callback([EncrypterDrone(n*-100, -200, -2400 + n*-110, 600, n/count*-math.pi/2, math.pi/2, 200, now+n*.35, make_fire_probability(0.1, (0.25,1.0)), self.dispatch_entity_munitions_callback) for n in xrange(int(count))])
@@ -639,7 +644,7 @@ class LevelOne (object):
             if self.wave_counter > 6:
                 self.mode = 3
                 self.wave_counter = 0
-                print self.mode
+                print(self.mode)
         elif self.mode == 3:
             count = 4.0
             self.dispatch_callback([EncrypterDrone(n*-100, -200, -2400 + n*-110, 600, n/count*-math.pi/2, math.pi/2, 200, now+n*.35, 0, self.dispatch_entity_munitions_callback) for n in xrange(int(count))])
@@ -656,7 +661,7 @@ class LevelOne (object):
             if not self.payload and self.wave_counter > 18:
                 self.mode = 5
                 self.wave_counter = 0
-                print self.mode
+                print(self.mode)
         elif self.mode == 5:
             count = 4.0
             self.dispatch_callback([EncrypterDrone(n*-100, -200, -2400 + n*-110, 600, n/count*-math.pi/2, math.pi/2, 200, now+n*.35, make_fire_probability(0.09, (0.09,1.0,0.1)), self.dispatch_entity_munitions_callback) for n in xrange(int(count))])
@@ -668,7 +673,7 @@ class LevelOne (object):
             if self.wave_counter > 8:
                 self.mode = 6
                 self.wave_counter = 0
-                print self.mode
+                print(self.mode)
         elif self.mode == 6:
             #~ x, y, z, phase_offset, phase_rate, phase_amplitude, appear_delay, fire_cycle, dispatch_callback
             count = 8.0
@@ -680,7 +685,7 @@ class LevelOne (object):
             if self.wave_counter > 4:
                 self.mode = 7
                 self.wave_counter = 0
-                print self.mode
+                print(self.mode)
         elif self.mode == 7:
             #~ x, y, z, phase_offset, phase_rate, phase_amplitude, appear_delay, fire_cycle, dispatch_callback
             count = 8.0
@@ -692,10 +697,10 @@ class LevelOne (object):
             if self.wave_counter > 4:
                 self.mode = 0
                 self.wave_counter = 0
-                print self.mode
+                print(self.mode)
         
 class GameScene (object):
-    game_music = SND_GAME_MUSIC
+    # game_music = SND_GAME_MUSIC
     
     def __init__ (self, window, framerate=60.0, level_framerate=30.0):
         self.player = None
@@ -711,18 +716,18 @@ class GameScene (object):
         #~ self.window.set_fullscreen(not self.window.fullscreen)
         #~ self.window.set_exclusive_mouse()
 
-        self.music_player = pyglet.media.Player()
-        self.music_player.eos_action = pyglet.media.Player.EOS_LOOP
-        self.music_player.queue(self.game_music)
+        # self.music_player = pyglet.media.Player()
+        # self.music_player.eos_action = pyglet.media.Player.EOS_LOOP
+        # self.music_player.queue(self.game_music)
         self.toggle_game_music(not DEBUG)
-        self.music_player.volume = 0.7
+        # self.music_player.volume = 0.7
         
         help_stream = open(os.path.join(os.getcwd(), 'assets', 'help.png'), 'rb')
         self.help_sprite = pyglet.sprite.Sprite(pyglet.image.load('help.png', help_stream))
         self.help_mode = False
         
-        self.joystick = joystick.JoystickHandler()
-        print "%d joystick(s) found. Press F2 to enable." % self.joystick.joysticks
+        # self.joystick = joystick.JoystickHandler()
+        # print("%d joystick(s) found. Press F2 to enable." % self.joystick.joysticks)
         self.toggle_joystick(True)
         self.score_label = pyglet.text.Label("00000000", 'Logic twenty-five A', 48, color=(200,00,0,255))
         self.health_label = pyglet.text.Label("000", 'Logic twenty-five A', 48, color=(200,00,0,255))
@@ -735,7 +740,7 @@ class GameScene (object):
         self.new_game()
     
     def status_check (self, dt):
-        print len(self.collision_entities), len(self.collision_entities_b), len(self.munitions_a), len(self.munitions_b), len(self.munitions_c)
+        print(len(self.collision_entities), len(self.collision_entities_b), len(self.munitions_a), len(self.munitions_b), len(self.munitions_c))
     
     def notify (self, what, duration=3.0):
         self.notification_label.text = str(what)
@@ -781,10 +786,10 @@ class GameScene (object):
     def update_game (self, dt):
         now = time.time()
         
-        self.joystick.dispatch_events()
+        # self.joystick.dispatch_events()
         self.player.update(dt, now)
         if self.player.health <= 0:
-            print "Game over! Your final score was %d" % self.score
+            print("Game over! Your final score was %d" % self.score)
             self.new_game()
             
         self.terrain.update(dt)
@@ -887,11 +892,13 @@ class GameScene (object):
     def toggle_joystick (self, active=False):
         self.joystick_mode = active
         if self.joystick_mode:
-            self.joystick.push_handlers(self.on_joystick_button, self.on_joystick_axis)
-            print "Joystick enabled"
+            pass
+            # self.joystick.push_handlers(self.on_joystick_button, self.on_joystick_axis)
+            # print "Joystick enabled"
         else:
-            self.joystick.pop_handlers()
-            print "Joystick disabled"
+            pass
+            # self.joystick.pop_handlers()
+            # print "Joystick disabled"
     
     def toggle_camera_mode (self, debug=False):
         self.camera_debug_mode = debug
@@ -910,16 +917,20 @@ class GameScene (object):
     def toggle_game_music (self, active=True):
         self.playing_music = active
         if self.playing_music:
-            self.music_player.play()
+            pass
+            # self.music_player.play()
         else:
-            self.music_player.pause()
+            pass
+            # self.music_player.pause()
 
     def toggle_help (self, active=True):
         self.playing_music = active
         if self.playing_music:
-            self.music_player.play()
+            pass
+            # self.music_player.play()
         else:
-            self.music_player.pause()
+            pass
+            # self.music_player.pause()
     
     def on_draw (self):
         self.window.clear()
@@ -997,12 +1008,12 @@ class GameScene (object):
         elif symbol == pyglet.window.key.K:
             self.fire_b = True
         elif symbol == pyglet.window.key.C:
-            print 'self.camera.x, self.camera.y, self.camera.z = (%s, %s, %s)' % (self.camera.x, self.camera.y, self.camera.z)
-            print 'self.camera.rx, self.camera.ry = (%s, %s)' % (self.camera.rx, self.camera.ry)
+            print('self.camera.x, self.camera.y, self.camera.z = (%s, %s, %s)' % (self.camera.x, self.camera.y, self.camera.z))
+            print('self.camera.rx, self.camera.ry = (%s, %s)' % (self.camera.rx, self.camera.ry))
         elif symbol == pyglet.window.key.F1:
             self.toggle_camera_mode(not self.camera_debug_mode)
-        elif symbol == pyglet.window.key.F2:
-            self.toggle_joystick(not self.joystick_mode)
+        # elif symbol == pyglet.window.key.F2:
+        #     self.toggle_joystick(not self.joystick_mode)
         elif symbol == pyglet.window.key.M:
             self.toggle_game_music(not self.playing_music)
         elif symbol == pyglet.window.key.H:
@@ -1143,10 +1154,10 @@ class TuxImperium (object):
 
 
 def main ():
-    if LooseVersion(platform.python_version()) < LooseVersion('2.4'):
-        print 'Warning: python version %s is unsupported.' % platform.python_version()
-    if LooseVersion(pyglet.version) < LooseVersion('1.1.2') :
-        print 'Warning: pyglet version %s is unsupported.' % pyglet.version
+    # if LooseVersion(platform.python_version()) < LooseVersion('2.4'):
+    #     print('Warning: python version %s is unsupported.' % platform.python_version())
+    # if LooseVersion(pyglet.version) < LooseVersion('1.1.2') :
+    #     print ('Warning: pyglet version %s is unsupported.' % pyglet.version)
     #~ if GPROFILER_ERROR:
         #~ print 'Failed to initialize profiler (%s)' % GPROFILER_ERROR
     #~ else:
